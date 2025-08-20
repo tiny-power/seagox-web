@@ -1,0 +1,246 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+ul,
+li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.el-select {
+    width: 100%;
+}
+
+.el-cascader {
+    width: 100%;
+}
+
+.el-date-editor--monthrange {
+    width: 100% !important;
+}
+
+.el-dialog {
+    border-radius: 8px !important;
+}
+
+.el-date-editor.el-input,
+.el-date-editor.el-input__inner {
+    width: 100% !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.el-input-number {
+    width: 100% !important;
+}
+
+.el-radio-group {
+    line-height: 40px;
+    vertical-align: baseline;
+}
+
+.el-switch {
+    height: 40px;
+}
+
+.el-range-editor {
+    width: 100%;
+}
+
+.el-tabs__nav-wrap::after {
+    background-color: #fff !important;
+}
+
+.el-tabs__item {
+    color: rgb(97, 97, 97);
+}
+
+.el-tabs__header {
+    margin: 0px !important;
+}
+
+.el-table td,
+.el-table th {
+    padding: 0px 0 !important;
+    font-size: 12px !important;
+    height: 36px;
+    color: #000 !important;
+}
+
+.el-table thead th {
+    background: #F2F6FC !important;
+    font-weight: bold;
+}
+
+.pagination {
+    text-align: right;
+    padding-top: 5px;
+}
+
+.el-pagination__total,
+.el-pagination__sizes,
+.el-pagination__jump {
+    height: 32px !important;
+    line-height: 32px !important;
+}
+
+.btn-prev {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 32px !important;
+    border: 1px solid #ebeef5 !important;
+}
+
+.el-pager li {
+    width: 32px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    text-align: center;
+    border-radius: 8px !important;
+}
+
+.btn-next {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 32px !important;
+    border: 1px solid #ebeef5 !important;
+}
+
+.el-aside .el-scrollbar__wrap {
+    overflow-x: hidden !important;
+}
+
+.el-main .el-scrollbar__wrap {
+    overflow-x: hidden !important;
+}
+
+.el-scrollbar__thumb {
+    background-color: var(--scrollbar-thumb-bgc) !important;
+}
+
+.cell-red {
+    color: #ae1c1c;
+}
+
+.toolView {
+    padding-left: 10px;
+    padding-top: 5px;
+}
+
+.searchView {
+    padding: 8px 8px 0px 0px;
+    display: flex;
+    background: #f4f6fa;
+    border-bottom: 1px solid #e3e7ee;
+}
+
+.searchView .el-form-item {
+    margin-bottom: 8px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield !important;
+}
+
+.avatar {
+    width: 146px;
+    height: 146px;
+    display: block;
+}
+
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: #3a6cfa;
+}
+
+.avatar-uploader-icon {
+    font-size: 28px !important;
+    color: #8c939d !important;
+    width: 146px !important;
+    height: 146px !important;
+    line-height: 146px !important;
+    text-align: center !important;
+}
+
+.custom .el-scrollbar__wrap {
+    overflow-x: hidden !important;
+}
+
+.el-menu--popup {
+    max-height: 90vh;
+    overflow: auto;
+}
+
+/* 此处增加改样式是因为侧边菜单没有弹出,作用于竖型侧边菜单 */
+.el-menu--vertical .el-menu {
+    position: unset;
+}
+
+.el-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 40px 0;
+}
+
+.el-textarea .el-textarea__inner {
+    font-family: auto;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    width: 4px;
+    background: #7d7d7d;
+}
+
+::-webkit-scrollbar-track {
+    width: 4px;
+    background: #eee;
+}
+
+.el-card__header {
+    padding: 12px 20px;
+}
+
+.el-input-number .el-input__inner {
+    text-align: left;
+}
+
+.el-popover {
+    min-width: 60px !important;
+    padding: 0px !important;
+}
+
+.el-button--medium {
+    font-size: 12px !important;
+}
