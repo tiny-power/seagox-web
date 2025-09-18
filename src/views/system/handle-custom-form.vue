@@ -17,7 +17,7 @@
                     type="primary"
                     icon="el-icon-printer"
                     @click="handlePrint"
-                    v-if="isFlow && !isAddView && printTemplate"
+                    v-if="!isAddView && printTemplate"
                     size="medium"
                     >打印</el-button
                 >
