@@ -31,7 +31,8 @@
                         margin: 'auto',
                         'box-sizing': 'border-box',
                         width: width - 2 * margin + 'mm',
-                        height: height - 2 * margin + 'mm'
+                        height: height - 2 * margin + 'mm',
+                        'table-layout': 'fixed'
                     }"
                 >
                     <tr v-for="(tr, tr_index) in rowJson" :key="tr_index">
@@ -40,7 +41,7 @@
                             :key="td_index"
                             :colspan="td.colspan"
                             :rowspan="td.rowspan"
-                            :style="getTdStyle(td.style, tr_index)"
+                            :style="getTdStyle(td.style, tr_index, td.value)"
                             v-html="formatValue(td.value, item, td.style)"
                         ></td>
                     </tr>
@@ -138,7 +139,7 @@ export default {
                 }
             })
         },
-        getTdStyle(style, index) {
+        getTdStyle(style, index, value) {
             let height = this.heightJson[index] / this.heightRatio
             style.height = height + 'px'
             style['border-left'] = '#000 1px solid'
@@ -146,12 +147,15 @@ export default {
             style['white-space'] = 'nowrap'
             style['overflow'] = 'hidden'
             style['font-size'] = '10px'
+            if (value === '{{qrcode}}') {
+                style['text-align'] = 'center'
+            }
             return [style]
         },
         formatValue(value, item, style) {
             let data = item
             if (value == '{{qrcode}}') {
-                let width = parseInt(style.width.replace('px', '')) / this.widthRatio + 'mm'
+                let width = parseInt(style.width.replace('px', '')) / this.widthRatio - 2 + 'mm'
                 let img = '<img src="' + item.qrcode + '" style="width:' + width + '"/>'
                 if (data.qrcode.indexOf('<img') === -1) {
                     data.qrcode = img
