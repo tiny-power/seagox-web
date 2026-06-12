@@ -122,14 +122,8 @@ export default {
             let menuArray = []
             for (let i = 0; i < menuList.length; i++) {
                 let item = menuList[i]
-                if (item.type === 1) {
-                    item.url = 'formList?id=' + item.path + '&title=' + item.name
-                } else if (item.type === 3) {
-                    item.url = 'handleCustomForm?formId=' + item.path + '&title=' + item.name
-                } else if (item.type === 5) {
+                if (item.type === 5) {
                     item.url = Math.random().toString(36).slice(-6)
-                } else if (item.type === 6) {
-                    item.url = 'analysis?id=' + item.path + '&title=' + item.name
                 } else {
                     item.url = item.path
                 }

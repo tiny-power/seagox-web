@@ -96,17 +96,7 @@ export default {
             }
             this.$axios.post('message/update', params).then(res => {
                 if (res.data.code == 200) {
-                    if (row.type == 1) {
-                        //暂存数据
-                        this.$router.push({
-                            path: '/handleCustomForm',
-                            query: {
-                                id: row.businessKey,
-                                formId: row.businessType,
-                                title: '事项详情'
-                            }
-                        })
-                    }
+                    
                 }
             })
         }

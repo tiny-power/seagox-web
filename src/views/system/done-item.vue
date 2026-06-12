@@ -127,14 +127,7 @@ export default {
             })
         },
         goDetail(row) {
-            this.$router.push({
-                path: '/handleCustomForm',
-                query: {
-                    id: row.businessKey,
-                    formId: row.businessType,
-                    title: row.name
-                }
-            })
+            
         },
         // 流程查看
         handleProcess(row) {

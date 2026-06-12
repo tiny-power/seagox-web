@@ -118,14 +118,7 @@ export default {
             })
         },
         goDetail(row) {
-            this.$router.push({
-                path: '/handleCustomForm',
-                query: {
-                    id: row.businessKey,
-                    formId: row.businessType,
-                    title: '事项详情'
-                }
-            })
+            
         },
         queryByPage() {
             let params = {
