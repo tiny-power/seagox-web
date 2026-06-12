@@ -1,22 +1,13 @@
 <template>
     <div class="readme-container">
-        <div class="drag-container" v-if="config.layout && config.layout.length != 0" :style="[config.styles]">
-            <gaugeShowComponent :layout="config.layout" @handleEvent="handleEvent" />
-        </div>
-        <div class="empty" v-if="config.layout.length == 0 && !component" :style="{ height: '100%' }">
+        <div class="empty" :style="{ height: '100%' }">
             <img src="@/assets/welcome.png" height="480" />
         </div>
-        <component :is="component" v-if="component" />
     </div>
 </template>
 
 <script>
-import gaugeShowComponent from '@/views/components/gauge/gauge-show-component'
-import china from '@/utils/china.json'
 export default {
-    components: {
-        gaugeShowComponent
-    },
     data() {
         return {
             height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
@@ -34,31 +25,12 @@ export default {
         }
     },
     mounted() {
-        this.queryAnalysis()
+        
     },
     methods: {
         execMounted() {
             if (this.jsApi.methods.hasOwnProperty('mounted')) {
                 this.mounted()
-            }
-        },
-        async queryAnalysis() {
-            let res = await this.$axios.get('door/queryAnalysis')
-            if (res.data.code == 200) {
-                if (res.data.data.id) {
-                    if (res.data.data.data.config) {
-                        this.config = JSON.parse(res.data.data.data.config)
-                        this.recursionAttribute(this.config.layout)
-                    }
-                    this.jsApi = this.utils.resolveScript(res.data.data.data.script)
-                    for (let key in this.jsApi.methods) {
-                        this.utils.addFunc(this, key, this.jsApi.methods[key].params, this.jsApi.methods[key].body)
-                    }
-                    for (let key in this.jsApi.fields) {
-                        this[key] = this.jsApi.fields[key]
-                    }
-                    this.execMounted()
-                }
             }
         },
         listToTreeByRule(arr, rule) {

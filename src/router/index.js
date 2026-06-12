@@ -90,30 +90,6 @@ const routes = [
                 }
             },
             {
-                name: 'handleCustomForm',
-                path: '/handleCustomForm',
-                component: () => import('@/views/system/handle-custom-form'),
-                meta: {
-                    keepAlive: true
-                }
-            },
-            {
-                name: 'formList',
-                path: '/formList',
-                component: () => import('@/views/system/form-list'),
-                meta: {
-                    keepAlive: true
-                }
-            },
-            {
-                name: 'analysis',
-                path: '/analysis',
-                component: () => import('@/views/system/analysis'),
-                meta: {
-                    keepAlive: true
-                }
-            },
-            {
                 name: 'todoItem',
                 path: '/todoItem',
                 component: () => import('@/views/system/todo-item'),
@@ -156,15 +132,6 @@ const routes = [
                 meta: {
                     keepAlive: true,
                     title: '我发起的'
-                }
-            },
-            {
-                name: 'application',
-                path: '/application',
-                component: () => import('@/views/system/application'),
-                meta: {
-                    keepAlive: true,
-                    title: '应用中心'
                 }
             }
         ]
