@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="leave-page" ref="page">
         <div class="toolView">
             <el-button type="text" icon="el-icon-plus" @click="showAddDialog" size="small" v-permission="'leave:add'"
                 >新增</el-button
@@ -46,8 +46,8 @@
                 </el-form-item>
             </el-form>
         </div>
-        <div class="table">
-            <el-table :data="tableData" border highlight-current-row stripe :height="clientHeight - 260">
+        <div class="table leave-table" ref="tableBox">
+            <el-table :data="tableData" border highlight-current-row stripe :height="tableHeight">
                 <el-table-column type="index" label="序号" width="55" align="center"></el-table-column>
                 <el-table-column prop="applicantName" label="申请人" align="center" width="100"></el-table-column>
                 <el-table-column
@@ -70,25 +70,32 @@
                 </el-table-column>
                 <el-table-column prop="submitTime" label="提交时间" align="center" width="160"></el-table-column>
                 <el-table-column prop="createTime" label="创建时间" align="center" width="160"></el-table-column>
-                <el-table-column label="操作" align="center" width="220">
+                <el-table-column label="操作" align="center" width="260">
                     <template slot-scope="scope">
                         <el-button
                             type="text"
                             size="small"
                             @click="showEditDialog(scope.row)"
-                            v-if="scope.row.status !== 1"
+                            v-if="canEdit(scope.row)"
                             v-permission="'leave:edit'"
                             >编辑</el-button
                         >
-                        <el-divider direction="vertical" v-if="scope.row.status !== 1"></el-divider>
+                        <el-divider
+                            direction="vertical"
+                            v-if="canEdit(scope.row) && (canSubmit(scope.row) || canDelete(scope.row) || scope.row.status !== 0)"
+                        ></el-divider>
                         <el-button
                             type="text"
                             size="small"
                             @click="submitRow(scope.row)"
-                            v-if="scope.row.status !== 1"
+                            v-if="canSubmit(scope.row)"
                             v-permission="'leave:submit'"
                             >提交</el-button
                         >
+                        <el-divider
+                            direction="vertical"
+                            v-if="canSubmit(scope.row) && (canDelete(scope.row) || scope.row.status !== 0)"
+                        ></el-divider>
                         <el-button
                             type="text"
                             size="small"
@@ -97,14 +104,18 @@
                             v-permission="'leave:cancel'"
                             >撤销</el-button
                         >
-                        <el-divider direction="vertical" v-if="scope.row.status !== 1"></el-divider>
+                        <el-divider direction="vertical" v-if="scope.row.status === 1"></el-divider>
                         <el-button
                             type="text"
                             size="small"
                             @click="deleteSubmit(scope.row)"
-                            v-if="scope.row.status !== 1"
+                            v-if="canDelete(scope.row)"
                             v-permission="'leave:delete'"
                             >删除</el-button
+                        >
+                        <el-divider direction="vertical" v-if="canDelete(scope.row) && scope.row.status !== 0"></el-divider>
+                        <el-button type="text" size="small" @click="handleProcess(scope.row)" v-if="scope.row.status !== 0"
+                            >流程查看</el-button
                         >
                     </template>
                 </el-table-column>
@@ -191,7 +202,7 @@
 export default {
     data() {
         return {
-            clientHeight: document.documentElement.clientHeight || document.body.clientHeight,
+            tableHeight: 300,
             tableData: [],
             pageNo: 1,
             total: 0,
@@ -226,8 +237,10 @@ export default {
             ],
             statusOptions: [
                 { value: 0, label: '草稿' },
-                { value: 1, label: '已提交' },
-                { value: 2, label: '已撤销' }
+                { value: 1, label: '审批中' },
+                { value: 2, label: '已撤销' },
+                { value: 3, label: '已通过' },
+                { value: 4, label: '已驳回' }
             ],
             formRules: {
                 leaveType: [{ required: true, message: '请选择请假类型', trigger: 'change' }],
@@ -240,7 +253,32 @@ export default {
     created() {
         this.queryByPage()
     },
+    mounted() {
+        this.setTableHeight()
+        window.addEventListener('resize', this.setTableHeight)
+    },
+    activated() {
+        this.setTableHeight()
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.setTableHeight)
+    },
     methods: {
+        setTableHeight() {
+            this.$nextTick(() => {
+                const page = this.$refs.page
+                const tableBox = this.$refs.tableBox
+                if (!page || !tableBox) {
+                    return
+                }
+                const pagination = tableBox.querySelector('.pagination')
+                const pageRect = page.getBoundingClientRect()
+                const tableRect = tableBox.getBoundingClientRect()
+                const paginationHeight = pagination ? pagination.offsetHeight : 0
+                const availableHeight = pageRect.bottom - tableRect.top - paginationHeight - 1
+                this.tableHeight = Math.max(120, Math.floor(availableHeight))
+            })
+        },
         async queryByPage() {
             const params = {
                 pageNo: this.pageNo,
@@ -257,10 +295,12 @@ export default {
             if (res.data.code == 200) {
                 this.tableData = res.data.data.list
                 this.total = res.data.data.total
+                this.setTableHeight()
             }
         },
         handleSearch() {
             this.pageNo = 1
+            this.setTableHeight()
             this.queryByPage()
         },
         resetSearch() {
@@ -346,6 +386,8 @@ export default {
                 if (res.data.code == 200) {
                     this.$message.success('提交成功')
                     this.queryByPage()
+                } else {
+                    this.$message.warning(res.data.message || '提交失败')
                 }
             })
         },
@@ -371,6 +413,16 @@ export default {
                 }
             })
         },
+        handleProcess(row) {
+            this.$router.push({
+                path: '/flowDisplay',
+                query: {
+                    businessKey: row.id,
+                    businessType: 'leave_request',
+                    title: '请假单-' + row.id
+                }
+            })
+        },
         leaveTypeFormatter(row) {
             const item = this.leaveTypeOptions.find(item => item.value === row.leaveType)
             return item ? item.label : ''
@@ -381,13 +433,41 @@ export default {
         },
         statusTagType(status) {
             if (status === 1) {
-                return 'success'
+                return 'warning'
             }
             if (status === 2) {
                 return 'info'
             }
+            if (status === 3) {
+                return 'success'
+            }
+            if (status === 4) {
+                return 'danger'
+            }
             return 'warning'
+        },
+        canEdit(row) {
+            return row.status === 0 || row.status === 2 || row.status === 4
+        },
+        canSubmit(row) {
+            return row.status === 0 || row.status === 2 || row.status === 4
+        },
+        canDelete(row) {
+            return row.status === 0 || row.status === 2 || row.status === 4
         }
     }
 }
 </script>
+<style scoped>
+.leave-page {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.leave-table {
+    flex: 1;
+    min-height: 0;
+}
+</style>
