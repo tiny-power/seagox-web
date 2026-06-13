@@ -74,6 +74,14 @@ const routes = [
                 }
             },
             {
+                name: 'leaveDetail',
+                path: '/leaveDetail',
+                component: () => import('@/views/system/leave-detail'),
+                meta: {
+                    title: '请假单详情'
+                }
+            },
+            {
                 name: 'userAdd',
                 path: '/userAdd',
                 component: () => import('@/views/system/user-add'),

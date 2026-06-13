@@ -64,7 +64,13 @@
             >
                 <el-table-column type="selection" width="55"> </el-table-column>
                 <el-table-column type="index" label="序号" width="50" align="center"></el-table-column>
-                <el-table-column prop="name" label="标题" align="center" show-overflow-tooltip></el-table-column>
+                <el-table-column
+                    prop="name"
+                    label="标题"
+                    align="center"
+                    :formatter="titleFormatter"
+                    show-overflow-tooltip
+                ></el-table-column>
                 <el-table-column
                     prop="assigneeName"
                     label="发起人"
@@ -218,8 +224,26 @@ export default {
         statusChange(val) {
             this.searchContent.status = val
         },
+        titleFormatter(row) {
+            if (row.businessType === 'leave_request' && row.assigneeName) {
+                return '请假单-' + row.assigneeName
+            }
+            return row.name
+        },
         goDetail(row) {
-            
+            if (row.businessType !== 'leave_request') {
+                this.handleProcess(row)
+                return
+            }
+            this.$router.push({
+                path: '/leaveDetail',
+                query: {
+                    businessKey: row.businessKey,
+                    businessType: row.businessType,
+                    title: this.titleFormatter(row),
+                    source: 'todo'
+                }
+            })
         },
         // 流程查看
         handleProcess(row) {
@@ -228,7 +252,7 @@ export default {
                 query: {
                     businessKey: row.businessKey,
                     businessType: row.businessType,
-                    title: row.name
+                    title: this.titleFormatter(row)
                 }
             })
         },
@@ -255,11 +279,29 @@ export default {
             this.queryByPage()
         },
         queryBusinessTypes() {
-            this.$axios.get('form/queryBusinessTypes').then(res => {
+            this.$axios.get('seaDefinition/queryByPage', { params: { pageNo: 1, pageSize: 999 } }).then(res => {
                 if (res.data.code === 200) {
-                    this.businessTypeOptions = res.data.data
+                    this.businessTypeOptions = this.buildBusinessTypeOptions(res.data.data.list)
                 }
             })
+        },
+        buildBusinessTypeOptions(list) {
+            let businessTypeMap = {}
+            list.forEach(item => {
+                if (!businessTypeMap[item.businessType]) {
+                    businessTypeMap[item.businessType] = {
+                        id: item.businessType,
+                        name: this.businessTypeFormatter(item)
+                    }
+                }
+            })
+            return Object.values(businessTypeMap)
+        },
+        businessTypeFormatter(item) {
+            if (item.businessType === 'leave_request') {
+                return '请假单'
+            }
+            return item.name || item.businessType
         },
         handleSelectionChange(val) {
             this.multipleSelection = val
@@ -283,6 +325,7 @@ export default {
             }
             this.$axios.post('flow/batchApprove', params).then(res => {
                 if (res.data.code === 200) {
+                    this.approvalVisible = false
                     this.pageNo = 1
                     this.queryByPage()
                     this.validVisible = true
