@@ -118,16 +118,12 @@ export default {
             })
         },
         buildBusinessTypeOptions(list) {
-            let businessTypeMap = {}
-            list.forEach(item => {
-                if (!businessTypeMap[item.businessType]) {
-                    businessTypeMap[item.businessType] = {
-                        id: item.businessType,
-                        name: this.businessTypeFormatter(item)
-                    }
+            return list.map(item => {
+                return {
+                    id: item.businessType,
+                    name: this.businessTypeFormatter(item)
                 }
             })
-            return Object.values(businessTypeMap)
         },
         businessTypeFormatter(item) {
             if (item.businessType === 'leave_request') {

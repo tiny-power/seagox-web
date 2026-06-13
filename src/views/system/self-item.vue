@@ -96,14 +96,40 @@ export default {
     },
     methods: {
         queryBusinessTypes() {
-            this.$axios.get('form/queryBusinessTypes').then(res => {
+            this.$axios.get('seaDefinition/queryByPage', { params: { pageNo: 1, pageSize: 999 } }).then(res => {
                 if (res.data.code === 200) {
-                    this.businessTypeOptions = res.data.data
+                    this.businessTypeOptions = this.buildBusinessTypeOptions(res.data.data.list)
                 }
             })
         },
+        buildBusinessTypeOptions(list) {
+            return list.map(item => {
+                return {
+                    id: item.businessType,
+                    name: this.businessTypeFormatter(item)
+                }
+            })
+        },
+        businessTypeFormatter(item) {
+            if (item.businessType === 'leave_request') {
+                return '请假单'
+            }
+            return item.name || item.businessType
+        },
         goDetail(row) {
-            
+            if (row.businessType !== 'leave_request') {
+                this.handleProcess(row)
+                return
+            }
+            this.$router.push({
+                path: '/leaveDetail',
+                query: {
+                    businessKey: row.businessKey,
+                    businessType: row.businessType,
+                    title: row.name,
+                    source: 'self'
+                }
+            })
         },
         // 流程查看
         handleProcess(row) {
