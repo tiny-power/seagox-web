@@ -32,7 +32,7 @@
                     v-for="(item, index) in menuList[selectIndex].children"
                     :key="index"
                     class="second-item"
-                    v-if="item.type != 5"
+                    v-if="item.type != 1"
                 >
                     <div @click="selectMenu(item.url)">
                         {{ item.name }}
@@ -101,10 +101,7 @@ export default {
     },
     methods: {
         async queryMenu() {
-            let params = {
-                classify: 1
-            }
-            const res = await this.$axios.get('menu/queryUserMenu', { params })
+            const res = await this.$axios.get('menu/queryUserMenu')
             if (res.data.code == 200) {
                 if (res.data.data) {
                     let shortcut = []
@@ -117,12 +114,12 @@ export default {
             }
         },
         resetmenu(data, shortcut, level) {
-            // 1:表单列表;2:按钮;3:新增页面;4:菜单页面;5:目录;6:仪表板;7:单页面;
+            // 1:目录;2:页面;3:按钮;
             let menuList = JSON.parse(JSON.stringify(data))
             let menuArray = []
             for (let i = 0; i < menuList.length; i++) {
                 let item = menuList[i]
-                if (item.type === 5) {
+                if (item.type === 1) {
                     item.url = Math.random().toString(36).slice(-6)
                 } else {
                     item.url = item.path
@@ -136,7 +133,7 @@ export default {
                     item.children = this.resetmenu(item.children, shortcut, level + 1)
                 }
                 menuArray.push(item)
-                if (level > 0 && item.type === 5) {
+                if (level > 0 && item.type === 1) {
                     let otherArray = []
                     if (this.otherMap.hasOwnProperty(item.parentId)) {
                         otherArray = this.otherMap[item.parentId]
@@ -153,7 +150,7 @@ export default {
         handleSelected(index) {
             if (
                 (this.menuList[index].children && this.menuList[index].children.length > 0) ||
-                this.menuList[index].type == 5
+                this.menuList[index].type == 1
             ) {
                 this.selectIndex = index
             } else {

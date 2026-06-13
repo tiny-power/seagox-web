@@ -184,27 +184,15 @@ router.beforeEach((to, from, next) => {
                         })
                         path = path.split('?')[0]
                     }
-                    if (asyRoutes[i].type == 7) {
-                        router.addRoute({
-                            name: path,
-                            path: encodeURI('/' + path),
-                            component: resolve => require([`@/views/${path}`], resolve),
-                            query: query,
-                            meta: {
-                                title: asyRoutes[i].name
-                            }
-                        })
-                    } else {
-                        router.addRoute('home', {
-                            name: path,
-                            path: encodeURI('/' + path),
-                            component: resolve => require([`@/views/${path}`], resolve),
-                            query: query,
-                            meta: {
-                                title: asyRoutes[i].name
-                            }
-                        })
-                    }
+                    router.addRoute('home', {
+                        name: path,
+                        path: encodeURI('/' + path),
+                        component: resolve => require([`@/views/${path}`], resolve),
+                        query: query,
+                        meta: {
+                            title: asyRoutes[i].name
+                        }
+                    })
                 }
                 router.addRoute({
                     name: 'notMatch',

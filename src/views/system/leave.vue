@@ -47,7 +47,7 @@
             </el-form>
         </div>
         <div class="table">
-            <el-table :data="tableData" border highlight-current-row stripe :height="clientHeight - 245">
+            <el-table :data="tableData" border highlight-current-row stripe :height="clientHeight - 260">
                 <el-table-column type="index" label="序号" width="55" align="center"></el-table-column>
                 <el-table-column prop="applicantName" label="申请人" align="center" width="100"></el-table-column>
                 <el-table-column

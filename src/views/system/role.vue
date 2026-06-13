@@ -58,38 +58,19 @@
                     <el-input v-model.trim="addForm.name" clearable placeholder="请输入名称"></el-input>
                 </el-form-item>
                 <el-form-item label="菜单" prop="path" style="max-height: 400px; overflow: auto">
-                    <el-tabs v-model="activeName" @tab-click="handleTabClick">
-                        <el-tab-pane label="PC端" name="pc">
-                            <el-tree
-                                ref="pcTree"
-                                :data="pcMenuData"
-                                show-checkbox
-                                node-key="id"
-                                style="margin-top: 15px"
-                                check-strictly
-                                @check="handleCheck"
-                            >
-                                <div slot-scope="{ node, data }">
-                                    {{ data.name }}
-                                </div>
-                            </el-tree>
-                        </el-tab-pane>
-                        <el-tab-pane label="移动端" name="mobile">
-                            <el-tree
-                                ref="mobileTree"
-                                :data="mobileMenuData"
-                                show-checkbox
-                                node-key="id"
-                                style="margin-top: 15px"
-                                check-strictly
-                                @check="handleCheck"
-                            >
-                                <div slot-scope="{ node, data }">
-                                    {{ data.name }}
-                                </div>
-                            </el-tree>
-                        </el-tab-pane>
-                    </el-tabs>
+                    <el-tree
+                        ref="addMenuTree"
+                        :data="menuData"
+                        show-checkbox
+                        node-key="id"
+                        style="margin-top: 15px"
+                        check-strictly
+                        @check="handleCheck"
+                    >
+                        <div slot-scope="{ node, data }">
+                            {{ data.name }}
+                        </div>
+                    </el-tree>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -104,38 +85,19 @@
                     <el-input v-model.trim="editForm.name" clearable placeholder="请输入名称"></el-input>
                 </el-form-item>
                 <el-form-item label="菜单" prop="path" style="max-height: 400px; overflow: auto">
-                    <el-tabs v-model="activeName" @tab-click="handleTabClick">
-                        <el-tab-pane label="PC端" name="pc">
-                            <el-tree
-                                ref="pcTree"
-                                :data="pcMenuData"
-                                show-checkbox
-                                node-key="id"
-                                style="margin-top: 15px"
-                                check-strictly
-                                @check="handleCheck"
-                            >
-                                <div slot-scope="{ node, data }">
-                                    {{ data.name }}
-                                </div>
-                            </el-tree>
-                        </el-tab-pane>
-                        <el-tab-pane label="移动端" name="mobile">
-                            <el-tree
-                                ref="mobileTree"
-                                :data="mobileMenuData"
-                                show-checkbox
-                                node-key="id"
-                                style="margin-top: 15px"
-                                check-strictly
-                                @check="handleCheck"
-                            >
-                                <div slot-scope="{ node, data }">
-                                    {{ data.name }}
-                                </div>
-                            </el-tree>
-                        </el-tab-pane>
-                    </el-tabs>
+                    <el-tree
+                        ref="editMenuTree"
+                        :data="menuData"
+                        show-checkbox
+                        node-key="id"
+                        style="margin-top: 15px"
+                        check-strictly
+                        @check="handleCheck"
+                    >
+                        <div slot-scope="{ node, data }">
+                            {{ data.name }}
+                        </div>
+                    </el-tree>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -252,8 +214,7 @@ export default {
                 name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
                 path: [{ required: true, message: '请选择菜单权限', trigger: 'blur' }]
             },
-            pcMenuData: [],
-            mobileMenuData: [],
+            menuData: [],
             dialogVisible: false,
             deptTreeData: [],
             unCheckedGridData: [],
@@ -263,38 +224,23 @@ export default {
             type: '',
             field: '',
             memberPptions: [],
-            roleId: '',
-            activeName: 'pc',
-            pcTreeArray: [],
-            mobileTreeArray: []
+            roleId: ''
         }
     },
     mounted() {
         this.queryByPage()
-        this.queryPcMenu()
-        this.queryMobileMenu()
+        this.queryMenu()
         this.queryDepartment()
         this.queryMember()
     },
     methods: {
-        async queryPcMenu() {
+        async queryMenu() {
             let params = {
-                classify: 1,
                 status: 1
             }
             let res = await this.$axios.get('menu/queryByCompanyId', { params })
             if (res.data.code == 200) {
-                this.pcMenuData = res.data.data
-            }
-        },
-        async queryMobileMenu() {
-            let params = {
-                classify: 2,
-                status: 1
-            }
-            let res = await this.$axios.get('menu/queryByCompanyId', { params })
-            if (res.data.code == 200) {
-                this.mobileMenuData = res.data.data
+                this.menuData = res.data.data
             }
         },
         // 成员数据
@@ -347,19 +293,12 @@ export default {
                 this.$refs.addForm.resetFields()
             }
             this.$nextTick(() => {
-                this.$refs.pcTree.setCheckedKeys([])
+                this.$refs.addMenuTree.setCheckedKeys([])
             })
         },
         //新增
         addSubmit() {
-            let pcTreeArray = this.pcTreeArray
-            let mobileTreeArray = this.mobileTreeArray
-            if (this.activeName === 'pc') {
-                pcTreeArray = this.$refs.pcTree.getCheckedKeys()
-            } else if (this.activeName === 'mobile') {
-                mobileTreeArray = this.$refs.mobileTree.getCheckedKeys()
-            }
-            this.addForm.path = pcTreeArray.concat(mobileTreeArray).toString()
+            this.addForm.path = this.$refs.addMenuTree.getCheckedKeys().toString()
             this.$refs.addForm.validate(valid => {
                 if (valid) {
                     this.$axios.post('role/insert', this.addForm).then(res => {
@@ -382,27 +321,16 @@ export default {
                 this.$refs.editForm.resetFields()
             }
             this.$nextTick(() => {
-                let checkedArr = this.editForm.path.split(',')
-                this.$refs.pcTree.setCheckedKeys([])
+                let checkedArr = (this.editForm.path || '').split(',').filter(value => value)
+                this.$refs.editMenuTree.setCheckedKeys([])
                 checkedArr.forEach(value => {
-                    this.$refs.pcTree.setChecked(value, true, false)
-                })
-                this.$refs.mobileTree.setCheckedKeys([])
-                checkedArr.forEach(value => {
-                    this.$refs.mobileTree.setChecked(value, true, false)
+                    this.$refs.editMenuTree.setChecked(value, true, false)
                 })
             })
         },
         //编辑
         editSubmit() {
-            let pcTreeArray = this.pcTreeArray
-            let mobileTreeArray = this.mobileTreeArray
-            if (this.activeName === 'pc') {
-                pcTreeArray = this.$refs.pcTree.getCheckedKeys()
-            } else if (this.activeName === 'mobile') {
-                mobileTreeArray = this.$refs.mobileTree.getCheckedKeys()
-            }
-            this.editForm.path = pcTreeArray.concat(mobileTreeArray).toString()
+            this.editForm.path = this.$refs.editMenuTree.getCheckedKeys().toString()
             this.$refs.editForm.validate(valid => {
                 if (valid) {
                     this.$axios.post('role/update', this.editForm).then(res => {
@@ -533,12 +461,8 @@ export default {
             this.$emit('confirm', this.type, this.field, result)
         },
         handleCheck(data) {
-            let node = null
-            if (this.activeName === 'pc') {
-                node = this.$refs.pcTree.getNode(data.id)
-            } else if (this.activeName === 'mobile') {
-                node = this.$refs.mobileTree.getNode(data.id)
-            }
+            let tree = this.addFormVisible ? this.$refs.addMenuTree : this.$refs.editMenuTree
+            let node = tree.getNode(data.id)
             if (node.checked) {
                 this.setParentNode(node)
                 this.setChildNode(node, true)
@@ -574,10 +498,6 @@ export default {
                     this.setChildNode(childNode, checked)
                 }
             }
-        },
-        handleTabClick(tab, event) {
-            this.pcTreeArray = this.$refs.pcTree.getCheckedKeys()
-            this.mobileTreeArray = this.$refs.mobileTree.getCheckedKeys()
         }
     }
 }

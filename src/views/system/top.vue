@@ -244,27 +244,15 @@ export default {
                             })
                             path = path.split('?')[0]
                         }
-                        if (asyRoutes[i].type == 7) {
-                            this.$router.addRoute({
-                                name: path,
-                                path: encodeURI('/' + path),
-                                component: resolve => require([`@/views/${path}`], resolve),
-                                query: query,
-                                meta: {
-                                    title: asyRoutes[i].name
-                                }
-                            })
-                        } else {
-                            this.$router.addRoute('home', {
-                                name: path,
-                                path: encodeURI('/' + path),
-                                component: resolve => require([`@/views/${path}`], resolve),
-                                query: query,
-                                meta: {
-                                    title: asyRoutes[i].name
-                                }
-                            })
-                        }
+                        this.$router.addRoute('home', {
+                            name: path,
+                            path: encodeURI('/' + path),
+                            component: resolve => require([`@/views/${path}`], resolve),
+                            query: query,
+                            meta: {
+                                title: asyRoutes[i].name
+                            }
+                        })
                     }
 
                     this.$store.commit('closeAll')
