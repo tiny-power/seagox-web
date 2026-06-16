@@ -120,7 +120,7 @@ export default {
     },
     methods: {
         queryBusinessTypes() {
-            this.$axios.get('seaDefinition/queryByPage', { params: { pageNo: 1, pageSize: 999 } }).then(res => {
+            this.$axios.get('flow/queryByPage', { params: { pageNo: 1, pageSize: 999 } }).then(res => {
                 if (res.data.code === 200) {
                     this.businessTypeOptions = this.buildBusinessTypeOptions(res.data.data.list)
                 }
