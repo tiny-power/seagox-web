@@ -223,7 +223,7 @@ export default {
             checkedMultipleSelection: [],
             type: '',
             field: '',
-            memberPptions: [],
+            memberOptions: [],
             roleId: ''
         }
     },
@@ -245,7 +245,7 @@ export default {
         },
         // 成员数据
         async queryMember() {
-            let res = await this.$axios.get('form/queryDynamic?path=member&type=list')
+            let res = await this.$axios.get('user/queryUserByCompanyId?companyId=' + localStorage.getItem('companyId'))
             if (res.data.code === 200) {
                 var options = []
                 for (var i = 0; i < res.data.data.length; i++) {
@@ -255,7 +255,7 @@ export default {
                         value: String(res.data.data[i].id)
                     })
                 }
-                this.memberPptions = options
+                this.memberOptions = options
             }
         },
         handleMemberDialog(row) {
@@ -265,7 +265,7 @@ export default {
             }
             this.$axios.get('user/queryUserIdByRoleId', { params }).then(res => {
                 if (res.data.code == 200) {
-                    this.showDialog('default', 'toUserIds', this.memberPptions, res.data.data)
+                    this.showDialog('default', 'toUserIds', this.memberOptions, res.data.data)
                 } else {
                     this.$message.error(res.data.message)
                 }
