@@ -3,13 +3,9 @@
         <el-form :model="form" label-width="80px" :rules="formRules" ref="form">
             <el-col :span="8">
                 <el-form-item label="所属部门" prop="departmentId">
-                    <el-cascader
-                        v-model="form.departmentId"
-                        :options="departmentOptions"
-                        :props="{ checkStrictly: true, emitPath: false, value: 'id', label: 'name' }"
-                        clearable
-                        placeholder="请选择所属部门"
-                    >
+                    <el-cascader v-model="form.departmentId" :options="departmentOptions"
+                        :props="{ checkStrictly: true, emitPath: false, value: 'id', label: 'name' }" clearable
+                        placeholder="请选择所属部门">
                     </el-cascader>
                 </el-form-item>
             </el-col>
@@ -33,13 +29,8 @@
             </el-col>
             <el-col :span="8">
                 <el-form-item label="密码" prop="password">
-                    <el-input
-                        autocomplete="new-password"
-                        v-model="form.password"
-                        show-password
-                        placeholder="请输入密码"
-                        clearable
-                    ></el-input>
+                    <el-input autocomplete="new-password" v-model="form.password" show-password placeholder="请输入密码"
+                        clearable></el-input>
                 </el-form-item>
             </el-col>
             <el-col :span="8">
@@ -97,7 +88,8 @@ export default {
                 ],
                 departmentId: [{ required: true, message: '请选择所属部门', trigger: 'change' }],
                 name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-                sex: [{ required: true, message: '请选择性别', trigger: 'change' }]
+                sex: [{ required: true, message: '请选择性别', trigger: 'change' }],
+                phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }]
             }
         }
     },

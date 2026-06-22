@@ -84,7 +84,8 @@ export default {
                 sort: [{ required: true, message: '请输入排序', trigger: 'blur' }],
                 departmentId: [{ required: true, message: '请选择所属部门', trigger: 'change' }],
                 name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-                sex: [{ required: true, message: '请选择性别', trigger: 'change' }]
+                sex: [{ required: true, message: '请选择性别', trigger: 'change' }],
+                phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }]
             }
         }
     },
