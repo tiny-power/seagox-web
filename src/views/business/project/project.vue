@@ -1,22 +1,21 @@
 <template>
     <div class="page">
         <div class="toolbar">
-            <el-button type="primary" size="small" icon="el-icon-plus" @click="$router.push('/projectAdd')"
+            <el-button type="primary" icon="el-icon-plus" @click="$router.push('/projectAdd')"
                 >新增项目</el-button
             >
             <div class="filters">
-                <el-input v-model="query.code" size="small" placeholder="项目编号" clearable /><el-input
+                <el-input v-model="query.code" placeholder="项目编号" clearable /><el-input
                     v-model="query.name"
-                    size="small"
                     placeholder="项目名称"
                     clearable
-                /><el-select v-model="query.status" size="small" placeholder="项目状态" clearable
+                /><el-select v-model="query.status" placeholder="项目状态" clearable
                     ><el-option
                         v-for="item in statuses"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value" /></el-select
-                ><el-button size="small" type="primary" @click="load">查询</el-button>
+                ><el-button type="primary" @click="load">查询</el-button>
             </div>
         </div>
         <el-table :data="rows" border stripe

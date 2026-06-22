@@ -7,7 +7,6 @@
       <el-form
         :inline="true"
         :model="query"
-        size="small"
         class="filter-form"
         @submit.native.prevent
       >
