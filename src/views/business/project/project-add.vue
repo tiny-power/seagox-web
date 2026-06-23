@@ -2,87 +2,80 @@
     <div class="project-page" v-loading="loading">
         <div class="section-title">基本信息</div>
         <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-            <el-row :gutter="20"
-                ><el-col :span="8"
-                    ><el-form-item label="封面">
-                        <div class="cover-field">
+            <el-row :gutter="20" class="basic-info-row">
+                <el-col :span="6">
+                    <el-form-item label="封面" prop="cover">
+                        <div class="cover-field" :class="{ 'has-cover': form.cover }">
                             <el-upload
                                 class="cover-uploader"
                                 action=""
                                 accept="image/*"
-                                :show-file-list="false"
+                                list-type="picture-card"
+                                :file-list="coverFileList"
+                                :limit="1"
                                 :before-upload="beforeCoverUpload"
                                 :http-request="uploadCover"
+                                :on-preview="previewCover"
+                                :on-remove="removeCover"
                             >
-                                <img v-if="form.cover" :src="form.cover" class="cover-image" />
-                                <div v-else class="cover-placeholder">
-                                    <i v-if="!coverUploading" class="el-icon-plus" />
-                                    <i v-else class="el-icon-loading" />
-                                    <span>{{ coverUploading ? '上传中' : '上传封面' }}</span>
-                                </div>
+                                <i v-if="!coverUploading" class="el-icon-plus" />
+                                <i v-else class="el-icon-loading" />
                             </el-upload>
-                            <el-button v-if="form.cover" type="text" class="remove-cover" @click="form.cover = ''"
-                                >删除封面</el-button
-                            >
                         </div>
-                    </el-form-item></el-col
-                ><el-col :span="8"
-                    ><el-form-item label="项目编号" prop="code"
-                        ><el-input v-model="form.code" clearable /></el-form-item></el-col
-                ><el-col :span="8"
-                    ><el-form-item label="项目名称" prop="name"
-                        ><el-input v-model="form.name" clearable /></el-form-item></el-col
-                ><el-col v-if="false" :span="8"
-                    ><el-form-item label="项目状态" prop="status"
-                        ><el-select v-model="form.status"
-                            ><el-option
-                                v-for="i in statusOptions"
-                                :key="i.value"
-                                :label="i.label"
-                                :value="i.value" /></el-select></el-form-item></el-col
-            ></el-row>
-            <el-row :gutter="20"
-                ><el-col :span="8"
-                    ><el-form-item label="项目地址" prop="address"
-                        ><el-input v-model="form.address" clearable /></el-form-item></el-col
-                ><el-col :span="8"
-                    ><el-form-item label="预算金额"
-                        ><el-input-number
-                            v-model="form.budgetAmount"
-                            :min="0"
-                            :precision="2"
-                            :controls="false" /></el-form-item></el-col
-                ><el-col v-if="false" :span="8"
-                    ><el-form-item label="当前阶段"
-                        ><el-select v-model="form.currentPhase" clearable
-                            ><el-option
-                                v-for="i in phaseOptions"
-                                :key="i.value"
-                                :label="i.label"
-                                :value="i.value" /></el-select></el-form-item></el-col
-            ></el-row>
-            <el-row :gutter="20"
-                ><el-col v-if="false" :span="8"
-                    ><el-form-item label="健康状态"
-                        ><el-select v-model="form.healthStatus"
-                            ><el-option label="正常" :value="1" /><el-option
-                                label="预警"
-                                :value="2" /><el-option label="滞后" :value="3" /><el-option
-                                label="异常"
-                                :value="4" /></el-select></el-form-item></el-col
-                ><el-col :span="8"
-                    ><el-form-item label="计划开始" prop="plannedStartDate"
-                        ><el-date-picker
-                            v-model="form.plannedStartDate"
-                            value-format="yyyy-MM-dd"
-                            type="date" /></el-form-item></el-col
-                ><el-col :span="8"
-                    ><el-form-item label="计划结束" prop="plannedEndDate"
-                        ><el-date-picker
-                            v-model="form.plannedEndDate"
-                            value-format="yyyy-MM-dd"
-                            type="date" /></el-form-item></el-col
-            ></el-row>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="18" class="basic-info-fields">
+                    <el-row :gutter="20">
+                        <el-col :span="12">
+                            <el-form-item label="项目编号" prop="code">
+                                <el-input v-model="form.code" clearable />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="项目名称" prop="name">
+                                <el-input v-model="form.name" clearable />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="12">
+                            <el-form-item label="项目地址" prop="address">
+                                <el-input v-model="form.address" clearable />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="预算金额">
+                                <el-input-number
+                                    v-model="form.budgetAmount"
+                                    :min="0"
+                                    :precision="2"
+                                    :controls="false"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="12">
+                            <el-form-item label="计划开始" prop="plannedStartDate">
+                                <el-date-picker
+                                    v-model="form.plannedStartDate"
+                                    value-format="yyyy-MM-dd"
+                                    type="date"
+                                />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="计划结束" prop="plannedEndDate">
+                                <el-date-picker
+                                    v-model="form.plannedEndDate"
+                                    value-format="yyyy-MM-dd"
+                                    type="date"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-col>
+            </el-row>
             <el-row :gutter="20"
                 ><el-col v-if="form.status === 3" :span="16"
                     ><el-form-item label="暂停原因"><el-input v-model="form.pauseReason" /></el-form-item></el-col
@@ -333,6 +326,7 @@ export default {
                 plannedEndDate: ''
             },
             rules: {
+                cover: [{ required: true, message: '请上传封面', trigger: 'change' }],
                 code: [{ required: true, message: '请输入项目编号', trigger: 'blur' }],
                 name: [{ required: true, message: '请输入项目名称', trigger: 'blur' }],
                 address: [{ required: true, message: '请输入项目地址', trigger: 'blur' }],
@@ -375,12 +369,16 @@ export default {
     created() {
         this.loadUsers()
     },
+    computed: {
+        coverFileList() {
+            return this.form.cover ? [{ name: '项目封面', url: this.form.cover }] : []
+        }
+    },
     methods: {
         newStage() {
             let key = 'stage_' + Date.now() + '_' + Math.random()
             return {
                 key,
-                stageCode: 'STAGE_' + (this.stages.length + 1),
                 stageName: '',
                 flowType: 2,
                 sortOrder: this.stages.length + 1,
@@ -441,6 +439,7 @@ export default {
                 let response = await this.$axios.post('upload/putObject/oss', formData)
                 if (response.data.code === 200) {
                     this.form.cover = response.data.data
+                    this.$nextTick(() => this.$refs.form && this.$refs.form.validateField('cover'))
                     this.$message.success('封面上传成功')
                 } else {
                     this.$message.error(response.data.message)
@@ -450,6 +449,15 @@ export default {
             } finally {
                 this.coverUploading = false
             }
+        },
+        previewCover(file) {
+            if (file.url) {
+                window.open(file.url, '_blank')
+            }
+        },
+        removeCover() {
+            this.form.cover = ''
+            this.$nextTick(() => this.$refs.form && this.$refs.form.validateField('cover'))
         },
         async loadUsers() {
             let r = await this.$axios.get('user/queryByPage', {
@@ -575,6 +583,7 @@ export default {
     width: 100%;
 }
 .tab-tools {
+    margin-top: 1px;
     margin-bottom: 12px;
     text-align: right;
 }
@@ -582,43 +591,55 @@ export default {
     color: #303133;
 }
 .cover-field {
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-}
-::v-deep .cover-uploader .el-upload {
-    width: 160px;
-    height: 100px;
+    position: relative;
+    width: 120px;
+    height: 120px;
     overflow: hidden;
-    border: 1px dashed #dcdfe6;
-    border-radius: 6px;
-    background: #fafafa;
 }
-::v-deep .cover-uploader .el-upload:hover {
-    border-color: #409eff;
+::v-deep .cover-uploader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 120px;
 }
-.cover-image {
-    width: 160px;
-    height: 100px;
+::v-deep .cover-uploader .el-upload--picture-card,
+::v-deep .cover-uploader .el-upload-list--picture-card .el-upload-list__item {
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    vertical-align: top;
+}
+::v-deep .cover-uploader .el-upload-list--picture-card {
     display: block;
+    height: 120px;
+    line-height: 0;
+}
+::v-deep .cover-uploader .el-upload-list--picture-card .el-list-enter-active,
+::v-deep .cover-uploader .el-upload-list--picture-card .el-list-leave-active {
+    transition: none;
+}
+::v-deep .cover-uploader .el-upload-list--picture-card .el-upload-list__item {
+    margin: 0;
+    transition: none;
+}
+::v-deep .cover-uploader .el-upload-list--picture-card .el-upload-list__item-thumbnail {
+    width: 120px;
+    height: 120px;
     object-fit: cover;
 }
-.cover-placeholder {
-    width: 160px;
-    height: 100px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    color: #909399;
-    line-height: 20px;
+.cover-field:not(.has-cover) ::v-deep .cover-uploader .el-upload-list {
+    display: none;
 }
-.cover-placeholder i {
-    font-size: 22px;
+.has-cover ::v-deep .cover-uploader .el-upload--picture-card {
+    display: none;
 }
-.remove-cover {
-    color: #f56c6c;
+::v-deep .cover-uploader .el-upload-list__item-actions {
+    line-height: 120px;
+}
+::v-deep .cover-uploader .el-upload-list__item-actions span {
+    line-height: 1;
+    vertical-align: middle;
 }
 .user-dialog-toolbar {
     display: flex;

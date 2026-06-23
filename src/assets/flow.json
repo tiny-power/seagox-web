@@ -1,0 +1,358 @@
+[
+  {
+    "value": 2,
+    "label": "设计",
+    "stages": [
+      {
+        "stageName": "前期沟通",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "方案设计",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "方案深化确认",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "施工图出图",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "设计归档",
+        "inspectionItems": []
+      }
+    ]
+  },
+  {
+    "value": 3,
+    "label": "土建",
+    "stages": [
+      {
+        "stageName": "场地勘测与承载力测试",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "图纸会审",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "施工方案",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "班组合同",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "开工",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "地基基础验收",
+        "trigger": "基础施工完成，主体施工前",
+        "inspectionItems": [
+          {
+            "name": "地基处理合格",
+            "status": 0
+          },
+          {
+            "name": "基础尺寸及标高符合图纸",
+            "status": 0
+          },
+          {
+            "name": "钢筋规格及绑扎符合要求",
+            "status": 0
+          },
+          {
+            "name": "隐蔽工程记录完整",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "钢筋验收",
+        "inspectionItems": [
+          {
+            "name": "钢筋规格型号符合图纸",
+            "status": 0
+          },
+          {
+            "name": "钢筋间距及锚固长度符合要求",
+            "status": 0
+          },
+          {
+            "name": "保护层厚度符合要求",
+            "status": 0
+          },
+          {
+            "name": "隐蔽验收资料完整",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "混凝土浇筑及养护",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "主体结构验收",
+        "trigger": "主体结构完成，移交精装前",
+        "inspectionItems": [
+          {
+            "name": "梁柱尺寸及位置符合图纸",
+            "status": 0
+          },
+          {
+            "name": "楼板厚度及平整度符合要求",
+            "status": 0
+          },
+          {
+            "name": "预留洞口及预埋件位置准确",
+            "status": 0
+          },
+          {
+            "name": "结构整体质量合格",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "移交精装",
+        "inspectionItems": []
+      }
+    ]
+  },
+  {
+    "value": 4,
+    "label": "精装",
+    "stages": [
+      {
+        "stageName": "接收土建移交",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "图纸会审",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "施工方案",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "班组合同",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "开工",
+        "inspectionItems": []
+      },
+      {
+        "stageName": "砌筑验收",
+        "trigger": "砌体墙完成后",
+        "inspectionItems": [
+          {
+            "name": "砌体砂浆饱满度符合要求",
+            "status": 0
+          },
+          {
+            "name": "墙体垂直度及平整度符合要求",
+            "status": 0
+          },
+          {
+            "name": "洞口尺寸及位置准确",
+            "status": 0
+          },
+          {
+            "name": "拉结筋设置符合要求",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "防水验收",
+        "trigger": "防水施工完成后",
+        "inspectionItems": [
+          {
+            "name": "防水涂层厚度均匀",
+            "status": 0
+          },
+          {
+            "name": "卫生间、厨房、阳台防水范围符合要求",
+            "status": 0
+          },
+          {
+            "name": "48小时闭水试验无渗漏",
+            "status": 0
+          },
+          {
+            "name": "地漏周边处理符合要求",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "水电隐蔽验收",
+        "trigger": "管线完成，封墙封地面前",
+        "inspectionItems": [
+          {
+            "name": "给排水管道走向及坡度符合要求",
+            "status": 0
+          },
+          {
+            "name": "水压测试合格",
+            "status": 0
+          },
+          {
+            "name": "强弱电线管布局及线径规格符合要求",
+            "status": 0
+          },
+          {
+            "name": "点位高度尺寸符合图纸",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "抹灰验收",
+        "trigger": "抹灰完成后",
+        "inspectionItems": [
+          {
+            "name": "墙面平整度及垂直度符合要求",
+            "status": 0
+          },
+          {
+            "name": "阴阳角方正",
+            "status": 0
+          },
+          {
+            "name": "抹灰厚度均匀",
+            "status": 0
+          },
+          {
+            "name": "无空鼓开裂",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "瓷砖验收",
+        "trigger": "瓷砖铺贴完成后",
+        "inspectionItems": [
+          {
+            "name": "平整度符合要求",
+            "status": 0
+          },
+          {
+            "name": "空鼓率符合要求",
+            "status": 0
+          },
+          {
+            "name": "缝隙均匀",
+            "status": 0
+          },
+          {
+            "name": "色差控制合格",
+            "status": 0
+          },
+          {
+            "name": "地漏坡度符合要求",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "木作验收",
+        "trigger": "柜体门套完成后",
+        "inspectionItems": [
+          {
+            "name": "柜体方正度符合要求",
+            "status": 0
+          },
+          {
+            "name": "门套安装垂直度符合要求",
+            "status": 0
+          },
+          {
+            "name": "五金配件安装牢固",
+            "status": 0
+          },
+          {
+            "name": "表面无明显划痕及色差",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "涂料验收",
+        "trigger": "涂料完成后",
+        "inspectionItems": [
+          {
+            "name": "色差一致",
+            "status": 0
+          },
+          {
+            "name": "表面平整",
+            "status": 0
+          },
+          {
+            "name": "接缝处理到位",
+            "status": 0
+          },
+          {
+            "name": "阴阳角顺直",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "园林验收",
+        "trigger": "园林施工完成后",
+        "inspectionItems": [
+          {
+            "name": "硬景铺装、挡墙、水景施工合格",
+            "status": 0
+          },
+          {
+            "name": "软景植物成活率及种植位置符合要求",
+            "status": 0
+          },
+          {
+            "name": "灯光系统调试合格",
+            "status": 0
+          },
+          {
+            "name": "排水系统通畅",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "竣工综合验收",
+        "inspectionItems": [
+          {
+            "name": "各分项验收资料完整",
+            "status": 0
+          },
+          {
+            "name": "整改问题全部闭环",
+            "status": 0
+          },
+          {
+            "name": "现场观感质量合格",
+            "status": 0
+          },
+          {
+            "name": "竣工资料归档完整",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "交付",
+        "inspectionItems": []
+      }
+    ]
+  }
+]
