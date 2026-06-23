@@ -37,10 +37,11 @@
                 prop="plannedEndDate"
                 label="计划结束"
                 width="120"
-            /><el-table-column label="操作" width="140" fixed="right" align="center"
+            /><el-table-column label="操作" width="190" fixed="right" align="center"
                 ><template slot-scope="s"
                     ><el-button type="text" @click="$router.push({ path: '/projectEdit', query: { id: s.row.id } })"
                         >编辑</el-button
+                    ><el-button v-if="Number(s.row.status) === 1" type="text" @click="start(s.row)">启动</el-button
                     ><el-button type="text" class="danger" @click="remove(s.row)">删除</el-button></template
                 ></el-table-column
             ></el-table
@@ -75,13 +76,13 @@ export default {
             total: 0,
             query: { pageNo: 1, pageSize: 10, code: '', name: '', status: '' },
             statuses: [
-                { label: '草稿', value: 'DRAFT' },
-                { label: '待启动', value: 'PENDING_START' },
-                { label: '进行中', value: 'IN_PROGRESS' },
-                { label: '暂停', value: 'PAUSED' },
-                { label: '已交付', value: 'DELIVERED' },
-                { label: '已完结', value: 'CLOSED' },
-                { label: '已取消', value: 'CANCELLED' }
+                { label: '待启动', value: 1 },
+                { label: '进行中', value: 2 },
+                { label: '暂停', value: 3 },
+                { label: '已交付', value: 4 },
+                { label: '售后中', value: 5 },
+                { label: '已完结', value: 6 },
+                { label: '已取消', value: 7 }
             ]
         }
     },
@@ -90,7 +91,7 @@ export default {
     },
     methods: {
         statusLabel(v) {
-            let x = this.statuses.find(i => i.value === v)
+            let x = this.statuses.find(i => i.value === Number(v))
             return x ? x.label : v
         },
         async load() {
@@ -99,6 +100,15 @@ export default {
                 this.rows = r.data.data.list
                 this.total = r.data.data.total
             }
+        },
+        start(row) {
+            this.$confirm('确认启动项目“' + row.name + '”吗？', '提示', { type: 'warning' }).then(async () => {
+                let r = await this.$axios.post('project/start/' + row.id)
+                if (r.data.code === 200) {
+                    this.$message.success('启动成功')
+                    this.load()
+                } else this.$message.error(r.data.message)
+            })
         },
         remove(row) {
             this.$confirm('确认删除项目“' + row.name + '”吗？', '提示', { type: 'warning' }).then(async () => {

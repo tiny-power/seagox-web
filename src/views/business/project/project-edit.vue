@@ -11,7 +11,7 @@
                         ><el-input v-model="form.name" clearable /></el-form-item></el-col
                 ><el-col :span="8"
                     ><el-form-item label="项目状态" prop="status"
-                        ><el-select v-model="form.status"
+                        ><el-select v-model="form.status" disabled
                             ><el-option
                                 v-for="i in statusOptions"
                                 :key="i.value"
@@ -31,7 +31,7 @@
                             :controls="false" /></el-form-item></el-col
                 ><el-col :span="8"
                     ><el-form-item label="当前阶段"
-                        ><el-select v-model="form.currentPhase" clearable
+                        ><el-select v-model="form.currentPhase" disabled clearable
                             ><el-option
                                 v-for="i in phaseOptions"
                                 :key="i.value"
@@ -41,12 +41,12 @@
             <el-row :gutter="20"
                 ><el-col :span="8"
                     ><el-form-item label="健康状态"
-                        ><el-select v-model="form.healthStatus"
-                            ><el-option label="正常" value="NORMAL" /><el-option
+                        ><el-select v-model="form.healthStatus" disabled
+                            ><el-option label="正常" :value="1" /><el-option
                                 label="预警"
-                                value="WARNING" /><el-option label="滞后" value="DELAYED" /><el-option
-                                label="严重异常"
-                                value="CRITICAL" /></el-select></el-form-item></el-col
+                                :value="2" /><el-option label="滞后" :value="3" /><el-option
+                                label="异常"
+                                :value="4" /></el-select></el-form-item></el-col
                 ><el-col :span="8"
                     ><el-form-item label="计划开始" prop="plannedStartDate"
                         ><el-date-picker
@@ -84,9 +84,9 @@
                             >
                         </div>
                     </el-form-item></el-col
-                ><el-col v-if="form.status === 'PAUSED'" :span="16"
+                ><el-col v-if="form.status === 3" :span="16"
                     ><el-form-item label="暂停原因"><el-input v-model="form.pauseReason" /></el-form-item></el-col
-                ><el-col v-if="form.status === 'CANCELLED'" :span="16"
+                ><el-col v-if="form.status === 7" :span="16"
                     ><el-form-item label="取消原因"><el-input v-model="form.cancelReason" /></el-form-item></el-col
             ></el-row>
         </el-form>
@@ -117,9 +117,9 @@
                     ><el-table-column label="状态" width="130"
                         ><template slot-scope="s"
                             ><el-select v-model="s.row.status"
-                                ><el-option label="有效" value="ACTIVE" /><el-option
+                                ><el-option label="有效" :value="1" /><el-option
                                     label="无效"
-                                    value="INACTIVE" /></el-select></template></el-table-column
+                                    :value="2" /></el-select></template></el-table-column
                     ><el-table-column label="操作" width="80" align="center"
                         ><template slot-scope="s"
                             ><el-button type="text" class="danger" @click="members.splice(s.$index, 1)"
@@ -269,6 +269,7 @@
                 />
                 <el-table-column prop="name" label="姓名" min-width="140" />
                 <el-table-column prop="account" label="账号" min-width="160" />
+                <el-table-column prop="phone" label="手机号" min-width="130" />
                 <el-table-column label="状态" width="100" align="center">
                     <template slot-scope="scope">{{ scope.row.status === 1 ? '启用' : '禁用' }}</template>
                 </el-table-column>
@@ -323,9 +324,9 @@ export default {
                 name: '',
                 address: '',
                 budgetAmount: 0,
-                status: 'DRAFT',
-                currentPhase: 'PREPARATION',
-                healthStatus: 'NORMAL',
+                status: 1,
+                currentPhase: 1,
+                healthStatus: 1,
                 pauseReason: '',
                 cancelReason: '',
                 plannedStartDate: '',
@@ -340,35 +341,34 @@ export default {
                 plannedEndDate: [{ required: true, message: '请选择计划结束日期', trigger: 'change' }]
             },
             statusOptions: [
-                { label: '草稿', value: 'DRAFT' },
-                { label: '待启动', value: 'PENDING_START' },
-                { label: '进行中', value: 'IN_PROGRESS' },
-                { label: '暂停', value: 'PAUSED' },
-                { label: '已交付', value: 'DELIVERED' },
-                { label: '售后中', value: 'AFTER_SALES' },
-                { label: '已完结', value: 'CLOSED' },
-                { label: '已取消', value: 'CANCELLED' }
+                { label: '待启动', value: 1 },
+                { label: '进行中', value: 2 },
+                { label: '暂停', value: 3 },
+                { label: '已交付', value: 4 },
+                { label: '售后中', value: 5 },
+                { label: '已完结', value: 6 },
+                { label: '已取消', value: 7 }
             ],
             phaseOptions: [
-                { label: '筹备', value: 'PREPARATION' },
-                { label: '设计', value: 'DESIGN' },
-                { label: '土建', value: 'CIVIL' },
-                { label: '精装', value: 'DECORATION' },
-                { label: '交付', value: 'DELIVERY' },
-                { label: '售后', value: 'AFTER_SALES' }
+                { label: '筹备', value: 1 },
+                { label: '设计', value: 2 },
+                { label: '土建', value: 3 },
+                { label: '精装', value: 4 },
+                { label: '交付', value: 5 },
+                { label: '售后', value: 6 }
             ],
             roleOptions: [
-                { label: '设计师', value: 'DESIGNER' },
-                { label: '设计助理', value: 'ASSISTANT' },
-                { label: '土建项目经理', value: 'CIVIL_PM' },
-                { label: '精装项目经理', value: 'DECORATION_PM' },
-                { label: '施工员', value: 'CONSTRUCTOR' },
-                { label: '质检员', value: 'QC' },
-                { label: '成控人员', value: 'COST' },
-                { label: '财务人员', value: 'FINANCE' },
-                { label: '管理层', value: 'MANAGER' },
-                { label: '业主', value: 'OWNER' },
-                { label: '业主家属', value: 'OWNER_FAMILY' }
+                { label: '设计师', value: 1 },
+                { label: '设计助理', value: 2 },
+                { label: '土建项目经理', value: 3 },
+                { label: '精装项目经理', value: 4 },
+                { label: '施工员', value: 5 },
+                { label: '质检员', value: 6 },
+                { label: '成控人员', value: 7 },
+                { label: '财务人员', value: 8 },
+                { label: '管理层', value: 9 },
+                { label: '业主', value: 10 },
+                { label: '业主家属', value: 11 }
             ]
         }
     },
@@ -383,9 +383,9 @@ export default {
                 key,
                 stageCode: 'STAGE_' + (this.stages.length + 1),
                 stageName: '',
-                flowType: 'DESIGN',
+                flowType: 2,
                 sortOrder: this.stages.length + 1,
-                status: 'NOT_STARTED',
+                status: 1,
                 managerUserId: null,
                 plannedStartDate: '',
                 plannedEndDate: '',
@@ -402,7 +402,7 @@ export default {
             this.inspectionDialogVisible = true
         },
         addInspectionItem() {
-            this.inspectionItemsDraft.push({ name: '', status: 'NOT_STARTED' })
+            this.inspectionItemsDraft.push({ name: '', status: 0 })
         },
         confirmInspectionItems() {
             if (this.inspectionItemsDraft.some(item => !item.name || !item.name.trim())) {
@@ -515,7 +515,7 @@ export default {
             this.selectedUsers.forEach(selectedUser => {
                 if (this.members.some(item => item.userId === selectedUser.id)) return
                 if (!this.users.some(item => item.id === selectedUser.id)) this.users.push(selectedUser)
-                this.members.push({ userId: selectedUser.id, roleCode: '', status: 'ACTIVE' })
+                this.members.push({ userId: selectedUser.id, roleCode: '', status: 1 })
                 addedCount++
             })
             if (!addedCount) {
