@@ -4,12 +4,22 @@
             <div slot="header" class="card-header"><span>请款单</span></div>
             <el-form :inline="true" :model="query" class="filter-form" @submit.native.prevent>
                 <el-form-item label="项目名称">
-                    <el-input
-                        v-model.trim="query.projectName"
+                    <el-select
+                        v-model="query.projectId"
                         clearable
-                        placeholder="请输入项目名称"
-                        @keyup.enter.native="search"
-                    />
+                        filterable
+                        remote
+                        :remote-method="loadProjects"
+                        :loading="projectLoading"
+                        placeholder="请选择项目"
+                    >
+                        <el-option
+                            v-for="item in projectOptions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                        />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="申请人">
                     <el-input
@@ -132,18 +142,21 @@ export default {
     data() {
         return {
             loading: false,
+            projectLoading: false,
+            projectOptions: [],
             rows: [],
             total: 0,
             query: {
                 pageNo: 1,
                 pageSize: 10,
-                projectName: '',
+                projectId: '',
                 applicantName: '',
                 status: ''
             }
         }
     },
     created() {
+        this.loadProjects()
         this.load()
     },
     methods: {
@@ -151,7 +164,7 @@ export default {
             return {
                 pageNo: 1,
                 pageSize: 10,
-                projectName: '',
+                projectId: '',
                 applicantName: '',
                 status: ''
             }
@@ -186,6 +199,20 @@ export default {
         },
         buildParams() {
             return { ...this.query }
+        },
+        async loadProjects(name) {
+            this.projectLoading = true
+            try {
+                let response = await this.$axios.get('project/queryByPage', {
+                    params: { pageNo: 1, pageSize: 50, name: name || '' }
+                })
+                if (response.data.code === 200) {
+                    let data = response.data.data || {}
+                    this.projectOptions = data.list || []
+                } else this.$message.error(response.data.message || '项目查询失败')
+            } finally {
+                this.projectLoading = false
+            }
         },
         async load() {
             this.loading = true

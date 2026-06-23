@@ -18,25 +18,28 @@
                 ><el-button type="primary" @click="load">查询</el-button>
             </div>
         </div>
-        <el-table :data="rows" border stripe
+        <el-table class="project-data-table" :data="rows" border stripe
             ><el-table-column type="index" width="55" label="序号" align="center" /><el-table-column
                 prop="code"
                 label="项目编号"
+                align="center"
                 min-width="120"
-            /><el-table-column prop="name" label="项目名称" min-width="180" /><el-table-column
+            /><el-table-column prop="name" label="项目名称" min-width="180" align="center" /><el-table-column
                 prop="address"
                 label="项目地址"
+                align="center"
                 min-width="200"
                 show-overflow-tooltip
-            /><el-table-column prop="budgetAmount" label="预算金额" width="130" align="right" /><el-table-column
+            /><el-table-column prop="budgetAmount" label="预算金额" width="130" align="center" /><el-table-column
                 label="状态"
                 width="110"
                 align="center"
                 ><template slot-scope="s">{{ statusLabel(s.row.status) }}</template></el-table-column
-            ><el-table-column prop="plannedStartDate" label="计划开始" width="120" /><el-table-column
+            ><el-table-column prop="plannedStartDate" label="计划开始" width="120" align="center" /><el-table-column
                 prop="plannedEndDate"
                 label="计划结束"
                 width="120"
+                align="center"
             /><el-table-column label="操作" width="190" fixed="right" align="center"
                 ><template slot-scope="s"
                     ><el-button type="text" @click="$router.push({ path: '/projectEdit', query: { id: s.row.id } })"
@@ -142,6 +145,9 @@ export default {
 .el-pagination {
     margin-top: 16px;
     text-align: right;
+}
+::v-deep .project-data-table .el-table__cell {
+    text-align: center;
 }
 .danger {
     color: #f56c6c;

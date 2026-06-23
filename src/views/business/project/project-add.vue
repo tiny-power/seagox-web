@@ -2,9 +2,43 @@
     <div class="project-page" v-loading="loading">
         <div class="section-title">基本信息</div>
         <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-            <el-row :gutter="20" class="basic-info-row">
-                <el-col :span="6">
-                    <el-form-item label="封面" prop="cover">
+            <el-row :gutter="20">
+                <el-col :span="8">
+                    <el-form-item label="项目编号" prop="code">
+                        <el-input v-model="form.code" clearable />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="项目名称" prop="name">
+                        <el-input v-model="form.name" clearable />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="项目地址" prop="address">
+                        <el-input v-model="form.address" clearable />
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20">
+                <el-col :span="8">
+                    <el-form-item label="预算金额">
+                        <el-input-number v-model="form.budgetAmount" :min="0" :precision="2" :controls="false" />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="计划开始" prop="plannedStartDate">
+                        <el-date-picker v-model="form.plannedStartDate" value-format="yyyy-MM-dd" type="date" />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="计划结束" prop="plannedEndDate">
+                        <el-date-picker v-model="form.plannedEndDate" value-format="yyyy-MM-dd" type="date" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20"
+                ><el-col :span="8"
+                    ><el-form-item label="封面" prop="cover">
                         <div class="cover-field" :class="{ 'has-cover': form.cover }">
                             <el-upload
                                 class="cover-uploader"
@@ -22,61 +56,7 @@
                                 <i v-else class="el-icon-loading" />
                             </el-upload>
                         </div>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="18" class="basic-info-fields">
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item label="项目编号" prop="code">
-                                <el-input v-model="form.code" clearable />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="项目名称" prop="name">
-                                <el-input v-model="form.name" clearable />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item label="项目地址" prop="address">
-                                <el-input v-model="form.address" clearable />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="预算金额">
-                                <el-input-number
-                                    v-model="form.budgetAmount"
-                                    :min="0"
-                                    :precision="2"
-                                    :controls="false"
-                                />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-form-item label="计划开始" prop="plannedStartDate">
-                                <el-date-picker
-                                    v-model="form.plannedStartDate"
-                                    value-format="yyyy-MM-dd"
-                                    type="date"
-                                />
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-form-item label="计划结束" prop="plannedEndDate">
-                                <el-date-picker
-                                    v-model="form.plannedEndDate"
-                                    value-format="yyyy-MM-dd"
-                                    type="date"
-                                />
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                </el-col>
-            </el-row>
-            <el-row :gutter="20"
+                    </el-form-item></el-col
                 ><el-col v-if="form.status === 3" :span="16"
                     ><el-form-item label="暂停原因"><el-input v-model="form.pauseReason" /></el-form-item></el-col
                 ><el-col v-if="form.status === 7" :span="16"
@@ -91,15 +71,15 @@
                         >选择成员</el-button
                     >
                 </div>
-                <el-table :data="members" border
+                <el-table class="project-data-table" :data="members" border
                     ><el-table-column type="index" label="序号" width="60" align="center" />
-                    <el-table-column label="姓名" min-width="150"
+                    <el-table-column label="姓名" align="center" min-width="150"
                         ><template slot-scope="s"
                             ><span class="member-name">{{ userName(s.row.userId) }}</span></template
                         ></el-table-column
-                    ><el-table-column label="手机号" min-width="160"
+                    ><el-table-column label="手机号" align="center" min-width="160"
                         ><template slot-scope="s">{{ userPhone(s.row.userId) }}</template></el-table-column
-                    ><el-table-column label="项目角色" min-width="200"
+                    ><el-table-column label="项目角色" align="center" min-width="200"
                         ><template slot-scope="s"
                             ><el-select v-model="s.row.roleCode"
                                 ><el-option
@@ -107,7 +87,7 @@
                                     :key="r.value"
                                     :label="r.label"
                                     :value="r.value" /></el-select></template></el-table-column
-                    ><el-table-column label="状态" width="130"
+                    ><el-table-column label="状态" align="center" width="130"
                         ><template slot-scope="s"
                             ><el-select v-model="s.row.status"
                                 ><el-option label="有效" :value="1" /><el-option
@@ -129,9 +109,9 @@
                         添加阶段
                     </el-button>
                 </div>
-                <el-table :data="stages" border>
+                <el-table class="project-data-table" :data="stages" border>
                     <el-table-column type="index" label="序号" width="60" align="center" />
-                    <el-table-column label="流程类型" min-width="150">
+                    <el-table-column label="流程类型" align="center" min-width="150">
                         <template slot-scope="scope">
                             <el-select v-model="scope.row.flowType">
                                 <el-option
@@ -143,12 +123,13 @@
                             </el-select>
                         </template>
                     </el-table-column>
-                    <el-table-column label="阶段名称" min-width="180">
+                    <el-table-column label="阶段名称" align="center" min-width="180">
                         <template slot-scope="scope">
                             <el-input v-model="scope.row.stageName" placeholder="请输入阶段名称" />
                         </template>
                     </el-table-column>
-                    <el-table-column label="计划开始日期" min-width="170">
+                    <el-table-column align="center" min-width="170">
+                        <template slot="header"><span class="required-mark">*</span>计划开始日期</template>
                         <template slot-scope="scope">
                             <el-date-picker
                                 v-model="scope.row.plannedStartDate"
@@ -158,7 +139,8 @@
                             />
                         </template>
                     </el-table-column>
-                    <el-table-column label="计划完成日期" min-width="170">
+                    <el-table-column align="center" min-width="170">
+                        <template slot="header"><span class="required-mark">*</span>计划完成日期</template>
                         <template slot-scope="scope">
                             <el-date-picker
                                 v-model="scope.row.plannedEndDate"
@@ -168,7 +150,7 @@
                             />
                         </template>
                     </el-table-column>
-                    <el-table-column label="前置阶段" min-width="200">
+                    <el-table-column label="前置阶段" align="center" min-width="200">
                         <template slot-scope="scope">
                             <el-select
                                 v-model="scope.row.predecessorKeys"
@@ -245,6 +227,7 @@
                 <el-button size="small" type="primary" @click="searchUsers">查询</el-button>
             </div>
             <el-table
+                class="project-data-table"
                 ref="userTable"
                 v-loading="userLoading"
                 :data="userRows"
@@ -287,6 +270,8 @@
     </div>
 </template>
 <script>
+import flowTemplates from '@/assets/flow.json'
+
 export default {
     data() {
         return {
@@ -368,6 +353,7 @@ export default {
     },
     created() {
         this.loadUsers()
+        this.initStagesFromFlow()
     },
     computed: {
         coverFileList() {
@@ -392,6 +378,28 @@ export default {
                 predecessorKeys: [],
                 inspectionItems: []
             }
+        },
+        initStagesFromFlow() {
+            this.stages = flowTemplates.reduce((stages, module) => {
+                let moduleStages = module.stages || []
+                moduleStages.forEach(stage => {
+                    stages.push(this.newStageFromTemplate(module, stage, stages.length))
+                })
+                return stages
+            }, [])
+        },
+        newStageFromTemplate(module, template, index) {
+            let stage = this.newStage()
+            stage.key = 'stage_template_' + module.value + '_' + index
+            stage.flowType = module.value
+            stage.stageName = template.stageName
+            stage.sortOrder = index + 1
+            stage.remark = template.trigger || ''
+            stage.inspectionItems = (template.inspectionItems || []).map(item => ({
+                name: item.name,
+                status: item.status
+            }))
+            return stage
         },
         openInspectionDialog(stageIndex) {
             this.inspectionStageIndex = stageIndex
@@ -546,6 +554,10 @@ export default {
                 }
                 if (this.stages.some(x => !x.stageName || !x.flowType))
                     return this.$message.warning('请完善项目阶段信息')
+                if (this.stages.some(x => !x.plannedStartDate || !x.plannedEndDate)) {
+                    this.activeTab = 'stages'
+                    return this.$message.warning('请填写项目阶段计划开始日期和计划完成日期')
+                }
                 if (this.stages.some(x => x.inspectionItems.some(i => !i.name)))
                     return this.$message.warning('请填写阶段验收条目')
                 this.saving = true
@@ -589,6 +601,12 @@ export default {
 }
 .member-name {
     color: #303133;
+}
+::v-deep .project-data-table .el-table__cell {
+    text-align: center;
+}
+::v-deep .project-data-table .el-input__inner {
+    text-align: center;
 }
 .cover-field {
     position: relative;
