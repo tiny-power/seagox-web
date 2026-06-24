@@ -76,7 +76,7 @@
             </el-form>
         </div>
         <div class="table leave-table" ref="tableBox">
-            <el-table :data="tableData" border highlight-current-row stripe :height="tableHeight">
+            <el-table :data="tableData" border highlight-current-row stripe :height="tableHeight" @row-dblclick="goDetail">
                 <el-table-column type="index" label="序号" width="55" align="center"></el-table-column>
                 <el-table-column prop="applicantName" label="申请人" align="center" width="100"></el-table-column>
                 <el-table-column
@@ -517,6 +517,17 @@ export default {
                 }
             })
         },
+        goDetail(row) {
+            this.$router.push({
+                path: '/leaveDetail',
+                query: {
+                    businessKey: row.id,
+                    businessType: 'leave_request',
+                    title: '请假单-' + (row.applicantName || row.id),
+                    source: 'view'
+                }
+            })
+        },
         leaveTypeFormatter(row) {
             const item = this.leaveTypeOptions.find(item => item.value === row.leaveType)
             return item ? item.label : ''
@@ -563,5 +574,9 @@ export default {
 .leave-table {
     flex: 1;
     min-height: 0;
+}
+
+.leave-table ::v-deep .el-table__body tr {
+    cursor: pointer;
 }
 </style>

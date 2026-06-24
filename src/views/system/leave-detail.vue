@@ -60,6 +60,25 @@
                                     <el-input type="textarea" :rows="5" :value="leaveForm.reason" disabled></el-input>
                                 </el-form-item>
                             </el-col>
+                            <el-col :span="24">
+                                <el-form-item label="附件">
+                                    <div v-if="attachmentList.length" class="attachment-list">
+                                        <el-image
+                                            v-for="(item, index) in attachmentList"
+                                            :key="index"
+                                            class="attachment-image"
+                                            :src="item.path"
+                                            fit="cover"
+                                            :preview-src-list="attachmentImageUrls"
+                                        >
+                                            <div slot="error" class="image-error">
+                                                <i class="el-icon-picture-outline"></i>
+                                            </div>
+                                        </el-image>
+                                    </div>
+                                    <span v-else class="empty-attachment">暂无附件</span>
+                                </el-form-item>
+                            </el-col>
                         </el-row>
                     </el-form>
 
@@ -192,6 +211,26 @@ export default {
                 return '请假单-' + this.leaveForm.applicantName
             }
             return '请假单详情'
+        },
+        attachmentList() {
+            const attachments = this.parseAttachments(this.leaveForm.attachments)
+            return attachments
+                .map((item, index) => {
+                    if (typeof item === 'string') {
+                        return {
+                            name: '附件' + (index + 1),
+                            path: item
+                        }
+                    }
+                    return {
+                        name: item.name || '附件' + (index + 1),
+                        path: item.path || item.url || ''
+                    }
+                })
+                .filter(item => item.path)
+        },
+        attachmentImageUrls() {
+            return this.attachmentList.map(item => item.path)
         }
     },
     created() {
@@ -307,6 +346,23 @@ export default {
         },
         goBack() {
             this.$router.go(-1)
+        },
+        parseAttachments(value) {
+            if (Array.isArray(value)) {
+                return value
+            }
+            if (!value) {
+                return []
+            }
+            if (typeof value !== 'string') {
+                return []
+            }
+            try {
+                const result = JSON.parse(value)
+                return Array.isArray(result) ? result : []
+            } catch (e) {
+                return [value]
+            }
         },
         leaveTypeFormatter(value) {
             const item = this.leaveTypeOptions.find(item => item.value === value)
@@ -435,5 +491,32 @@ export default {
 ::v-deep .detail-section .el-row {
     margin-left: 0 !important;
     margin-right: 0 !important;
+}
+
+.attachment-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.attachment-image {
+    width: 96px;
+    height: 96px;
+    border: 1px solid #ebeef5;
+    border-radius: 4px;
+    background: #f5f7fa;
+}
+
+.image-error {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c0c4cc;
+    font-size: 24px;
+}
+
+.empty-attachment {
+    color: #909399;
 }
 </style>

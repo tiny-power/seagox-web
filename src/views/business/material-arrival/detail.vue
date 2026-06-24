@@ -9,8 +9,22 @@
                 <el-descriptions-item label="到场时间">{{ formatValue(record.arrivalAt) }}</el-descriptions-item>
                 <el-descriptions-item label="登记人">{{ formatValue(record.createdByName) }}</el-descriptions-item>
                 <el-descriptions-item label="备注" :span="2">{{ formatValue(record.remark) }}</el-descriptions-item>
-                <el-descriptions-item label="附件" :span="2">
-                    <pre class="json-content">{{ formatJson(record.attachments) }}</pre>
+                <el-descriptions-item label="照片" :span="2">
+                    <div v-if="attachmentImages.length" class="photo-wall">
+                        <el-image
+                            v-for="(item, index) in attachmentImages"
+                            :key="item.url + index"
+                            class="photo-item"
+                            :src="item.url"
+                            :preview-src-list="previewImages"
+                            fit="cover"
+                        >
+                            <div slot="error" class="image-error">
+                                <i class="el-icon-picture-outline"></i>
+                            </div>
+                        </el-image>
+                    </div>
+                    <span v-else>-</span>
                 </el-descriptions-item>
                 <el-descriptions-item label="登记时间">{{ formatValue(record.createdAt) }}</el-descriptions-item>
                 <el-descriptions-item label="更新时间">{{ formatValue(record.updatedAt) }}</el-descriptions-item>
@@ -25,6 +39,14 @@ export default {
     data() {
         return { loading: false, record: {} }
     },
+    computed: {
+        attachmentImages() {
+            return this.parseAttachments(this.record.attachments)
+        },
+        previewImages() {
+            return this.attachmentImages.map(item => item.url)
+        }
+    },
     created() {
         this.load()
     },
@@ -32,22 +54,24 @@ export default {
         formatValue(value) {
             return value === null || value === undefined || value === '' ? '-' : value
         },
-        formatBoolean(value) {
-            if (value === null || value === undefined || value === '') return '-'
-            return Number(value) === 1 ? '是' : '否'
-        },
-        formatMoney(value) {
-            if (value === null || value === undefined || value === '') return '-'
-            return '¥' + Number(value).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        },
-
-        formatJson(value) {
-            if (value === null || value === undefined || value === '') return '-'
+        parseAttachments(value) {
+            if (value === null || value === undefined || value === '') return []
             try {
                 let data = typeof value === 'string' ? JSON.parse(value) : value
-                return JSON.stringify(data, null, 2)
+                if (!Array.isArray(data)) return []
+                return data
+                    .map(item => {
+                        if (typeof item === 'string') {
+                            return { url: item }
+                        }
+                        return {
+                            url: item.url || item.path || item.src || '',
+                            name: item.name || ''
+                        }
+                    })
+                    .filter(item => item.url)
             } catch (e) {
-                return String(value)
+                return typeof value === 'string' ? [{ url: value }] : []
             }
         },
         async load() {
@@ -73,13 +97,25 @@ export default {
     font-size: 16px;
     font-weight: 600;
 }
-.json-content {
-    max-height: 360px;
-    margin: 0;
-    overflow: auto;
-    white-space: pre-wrap;
-    word-break: break-all;
-    font-family: inherit;
-    line-height: 1.6;
+.photo-wall {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.photo-item {
+    width: 120px;
+    height: 120px;
+    border: 1px solid #ebeef5;
+    border-radius: 4px;
+    background: #f5f7fa;
+}
+.image-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #c0c4cc;
+    font-size: 26px;
 }
 </style>
