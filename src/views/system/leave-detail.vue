@@ -151,6 +151,8 @@
 </template>
 
 <script>
+import { parseAttachmentArray } from '@/utils/attachments'
+
 export default {
     data() {
         return {
@@ -213,21 +215,12 @@ export default {
             return '请假单详情'
         },
         attachmentList() {
-            const attachments = this.parseAttachments(this.leaveForm.attachments)
-            return attachments
-                .map((item, index) => {
-                    if (typeof item === 'string') {
-                        return {
-                            name: '附件' + (index + 1),
-                            path: item
-                        }
-                    }
-                    return {
-                        name: item.name || '附件' + (index + 1),
-                        path: item.path || item.url || ''
-                    }
-                })
-                .filter(item => item.path)
+            return parseAttachmentArray(this.leaveForm.attachments).map(item => ({
+                name: item.name,
+                path: item.url,
+                type: item.type,
+                size: item.size
+            }))
         },
         attachmentImageUrls() {
             return this.attachmentList.map(item => item.path)
@@ -348,21 +341,7 @@ export default {
             this.$router.go(-1)
         },
         parseAttachments(value) {
-            if (Array.isArray(value)) {
-                return value
-            }
-            if (!value) {
-                return []
-            }
-            if (typeof value !== 'string') {
-                return []
-            }
-            try {
-                const result = JSON.parse(value)
-                return Array.isArray(result) ? result : []
-            } catch (e) {
-                return [value]
-            }
+            return parseAttachmentArray(value)
         },
         leaveTypeFormatter(value) {
             const item = this.leaveTypeOptions.find(item => item.value === value)

@@ -1,8 +1,6 @@
 <template>
-    <div class="detail-page">
-        <el-card v-loading="loading" shadow="never">
-            <div slot="header" class="card-header"><span>请款单详情</span></div>
-            <el-descriptions v-if="record.id" :column="2" border>
+    <div v-loading="loading" class="detail-page">
+            <el-descriptions v-if="record.id" class="detail-descriptions" :column="2" border>
                 <el-descriptions-item label="项目名称">{{ formatValue(record.projectName) }}</el-descriptions-item>
                 <el-descriptions-item label="项目编号">{{ formatValue(record.projectCode) }}</el-descriptions-item>
                 <el-descriptions-item label="申请人">{{ formatValue(record.applicantName) }}</el-descriptions-item>
@@ -10,7 +8,21 @@
                 <el-descriptions-item label="状态">{{ formatPaymentStatus(record.status) }}</el-descriptions-item>
                 <el-descriptions-item label="请款事由" :span="2">{{ formatValue(record.reason) }}</el-descriptions-item>
                 <el-descriptions-item label="附件" :span="2">
-                    <pre class="json-content">{{ formatJson(record.attachments) }}</pre>
+                    <div v-if="attachmentImages.length" class="photo-wall">
+                        <el-image
+                            v-for="(item, index) in attachmentImages"
+                            :key="item.url + index"
+                            class="photo-item"
+                            :src="item.url"
+                            :preview-src-list="previewImages"
+                            fit="cover"
+                        >
+                            <div slot="error" class="image-error">
+                                <i class="el-icon-picture-outline"></i>
+                            </div>
+                        </el-image>
+                    </div>
+                    <span v-else>-</span>
                 </el-descriptions-item>
                 <el-descriptions-item label="提交时间">{{ formatValue(record.submitTime) }}</el-descriptions-item>
                 <el-descriptions-item label="创建人">{{ formatValue(record.createdByName) }}</el-descriptions-item>
@@ -18,14 +30,23 @@
                 <el-descriptions-item label="更新时间">{{ formatValue(record.updatedAt) }}</el-descriptions-item>
             </el-descriptions>
             <el-empty v-else-if="!loading" description="暂无详情数据" />
-        </el-card>
     </div>
 </template>
 
 <script>
+import { parseAttachmentArray } from '@/utils/attachments'
+
 export default {
     data() {
         return { loading: false, record: {} }
+    },
+    computed: {
+        attachmentImages() {
+            return this.parseAttachments(this.record.attachments)
+        },
+        previewImages() {
+            return this.attachmentImages.map(item => item.url)
+        }
     },
     created() {
         this.load()
@@ -59,14 +80,8 @@ export default {
                     return value
             }
         },
-        formatJson(value) {
-            if (value === null || value === undefined || value === '') return '-'
-            try {
-                let data = typeof value === 'string' ? JSON.parse(value) : value
-                return JSON.stringify(data, null, 2)
-            } catch (e) {
-                return String(value)
-            }
+        parseAttachments(value) {
+            return parseAttachmentArray(value)
         },
         async load() {
             if (!this.$route.query.id) return
@@ -87,17 +102,29 @@ export default {
 .detail-page {
     padding: 20px;
 }
-.card-header {
-    font-size: 16px;
-    font-weight: 600;
+.detail-descriptions {
+    border-radius: 8px;
+    overflow: hidden;
 }
-.json-content {
-    max-height: 360px;
-    margin: 0;
-    overflow: auto;
-    white-space: pre-wrap;
-    word-break: break-all;
-    font-family: inherit;
-    line-height: 1.6;
+.photo-wall {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.photo-item {
+    width: 120px;
+    height: 120px;
+    border: 1px solid #ebeef5;
+    border-radius: 4px;
+    background: #f5f7fa;
+}
+.image-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #c0c4cc;
+    font-size: 26px;
 }
 </style>

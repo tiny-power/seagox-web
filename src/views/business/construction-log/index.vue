@@ -1,7 +1,5 @@
 <template>
     <div class="document-page">
-        <el-card shadow="never">
-            <div slot="header" class="card-header"><span>施工日志</span></div>
             <el-form :inline="true" :model="query" class="filter-form" @submit.native.prevent>
                 <el-form-item label="项目名称">
                     <el-select
@@ -21,11 +19,8 @@
                         />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="状态">
-                    <el-select v-model="query.status" clearable placeholder="请选择状态">
-                        <el-option label="已提交" :value="1" />
-                        <el-option label="草稿" :value="2" />
-                    </el-select>
+                <el-form-item label="填写人">
+                    <el-input v-model.trim="query.filledByName" clearable placeholder="请输入填写人" />
                 </el-form-item>
                 <el-form-item label="日志日期">
                     <el-date-picker
@@ -42,14 +37,17 @@
                     ><el-button icon="el-icon-refresh" @click="reset">重置</el-button></el-form-item
                 >
             </el-form>
-            <el-table
-                v-loading="loading"
-                :data="rows"
-                :row-style="{ cursor: 'pointer' }"
-                border
-                stripe
-                @row-dblclick="view"
-            >
+            <div class="table-wrapper">
+                <el-table
+                    class="rounded-table"
+                    v-loading="loading"
+                    :data="rows"
+                    :row-style="{ cursor: 'pointer' }"
+                    height="100%"
+                    border
+                    stripe
+                    @row-dblclick="view"
+                >
                 <el-table-column type="index" label="序号" width="55" align="center" />
                 <el-table-column
                     prop="projectName"
@@ -79,7 +77,7 @@
                     header-align="center"
                     show-overflow-tooltip
                 >
-                    <template slot-scope="scope">{{ formatValue(scope.row.logDate) }}</template>
+                    <template slot-scope="scope">{{ formatDate(scope.row.logDate) }}</template>
                 </el-table-column>
                 <el-table-column
                     prop="filledByName"
@@ -99,7 +97,7 @@
                     header-align="center"
                     show-overflow-tooltip
                 >
-                    <template slot-scope="scope">{{ formatValue(scope.row.expectedCompletionAt) }}</template>
+                    <template slot-scope="scope">{{ formatDate(scope.row.expectedCompletionAt) }}</template>
                 </el-table-column>
                 <el-table-column
                     prop="hasIssue"
@@ -111,17 +109,8 @@
                 >
                     <template slot-scope="scope">{{ formatBoolean(scope.row.hasIssue) }}</template>
                 </el-table-column>
-                <el-table-column
-                    prop="status"
-                    label="状态"
-                    width="100"
-                    align="center"
-                    header-align="center"
-                    show-overflow-tooltip
-                >
-                    <template slot-scope="scope">{{ formatConstructionStatus(scope.row.status) }}</template>
-                </el-table-column>
-            </el-table>
+                </el-table>
+            </div>
             <el-pagination
                 background
                 layout="total, sizes, prev, pager, next, jumper"
@@ -132,7 +121,6 @@
                 @current-change="pageChange"
                 @size-change="sizeChange"
             />
-        </el-card>
     </div>
 </template>
 
@@ -149,7 +137,7 @@ export default {
                 pageNo: 1,
                 pageSize: 10,
                 projectId: '',
-                status: '',
+                filledByName: '',
                 dateRange: []
             }
         }
@@ -164,12 +152,16 @@ export default {
                 pageNo: 1,
                 pageSize: 10,
                 projectId: '',
-                status: '',
+                filledByName: '',
                 dateRange: []
             }
         },
         formatValue(value) {
             return value === null || value === undefined || value === '' ? '-' : value
+        },
+        formatDate(value) {
+            if (value === null || value === undefined || value === '') return '-'
+            return String(value).substring(0, 10)
         },
         formatBoolean(value) {
             if (value === null || value === undefined || value === '') return '-'
@@ -178,17 +170,6 @@ export default {
         formatMoney(value) {
             if (value === null || value === undefined || value === '') return '-'
             return '¥' + Number(value).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        },
-        formatConstructionStatus(value) {
-            if (value === null || value === undefined || value === '') return '-'
-            switch (String(value)) {
-                case '1':
-                    return '已提交'
-                case '2':
-                    return '草稿'
-                default:
-                    return value
-            }
         },
         buildParams() {
             let range = this.query.dateRange || []
@@ -250,13 +231,15 @@ export default {
 <style scoped>
 .document-page {
     padding: 20px;
-}
-.card-header {
-    font-size: 16px;
-    font-weight: 600;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 .filter-form {
     margin-bottom: 4px;
+    flex: none;
 }
 .filter-form .el-input,
 .filter-form .el-select {
@@ -265,8 +248,18 @@ export default {
 .filter-form .el-date-editor {
     width: 250px;
 }
+.rounded-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+.table-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
 .el-pagination {
     margin-top: 16px;
     text-align: right;
+    flex: none;
 }
 </style>

@@ -289,7 +289,7 @@
         </el-dialog>
         <div class="footer">
             <el-button @click="close">取消</el-button
-            ><el-button type="primary" :loading="saving" @click="submit">保存修改</el-button>
+            ><el-button type="primary" :loading="saving" @click="submit">保存</el-button>
         </div>
     </div>
 </template>
@@ -705,7 +705,7 @@ export default {
 .footer {
     position: fixed;
     z-index: 10;
-    left: 200px;
+    left: 0px;
     right: 0;
     bottom: 0;
     padding: 12px 24px;

@@ -1,8 +1,6 @@
 <template>
-    <div class="detail-page">
-        <el-card v-loading="loading" shadow="never">
-            <div slot="header" class="card-header"><span>材料到场详情</span></div>
-            <el-descriptions v-if="record.id" :column="2" border>
+    <div v-loading="loading" class="detail-page">
+            <el-descriptions v-if="record.id" class="detail-descriptions" :column="2" border>
                 <el-descriptions-item label="项目名称">{{ formatValue(record.projectName) }}</el-descriptions-item>
                 <el-descriptions-item label="项目编号">{{ formatValue(record.projectCode) }}</el-descriptions-item>
                 <el-descriptions-item label="材料名称">{{ formatValue(record.name) }}</el-descriptions-item>
@@ -30,11 +28,12 @@
                 <el-descriptions-item label="更新时间">{{ formatValue(record.updatedAt) }}</el-descriptions-item>
             </el-descriptions>
             <el-empty v-else-if="!loading" description="暂无详情数据" />
-        </el-card>
     </div>
 </template>
 
 <script>
+import { parseAttachmentArray } from '@/utils/attachments'
+
 export default {
     data() {
         return { loading: false, record: {} }
@@ -55,24 +54,7 @@ export default {
             return value === null || value === undefined || value === '' ? '-' : value
         },
         parseAttachments(value) {
-            if (value === null || value === undefined || value === '') return []
-            try {
-                let data = typeof value === 'string' ? JSON.parse(value) : value
-                if (!Array.isArray(data)) return []
-                return data
-                    .map(item => {
-                        if (typeof item === 'string') {
-                            return { url: item }
-                        }
-                        return {
-                            url: item.url || item.path || item.src || '',
-                            name: item.name || ''
-                        }
-                    })
-                    .filter(item => item.url)
-            } catch (e) {
-                return typeof value === 'string' ? [{ url: value }] : []
-            }
+            return parseAttachmentArray(value)
         },
         async load() {
             if (!this.$route.query.id) return
@@ -93,9 +75,9 @@ export default {
 .detail-page {
     padding: 20px;
 }
-.card-header {
-    font-size: 16px;
-    font-weight: 600;
+.detail-descriptions {
+    border-radius: 8px;
+    overflow: hidden;
 }
 .photo-wall {
     display: flex;

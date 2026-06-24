@@ -1,24 +1,32 @@
 <template>
-    <div class="page">
-        <div class="toolbar">
-            <el-button type="primary" icon="el-icon-plus" @click="$router.push('/projectAdd')"
-                >新增项目</el-button
-            >
-            <div class="filters">
-                <el-input v-model="query.code" placeholder="项目编号" clearable /><el-input
-                    v-model="query.name"
-                    placeholder="项目名称"
-                    clearable
-                /><el-select v-model="query.status" placeholder="项目状态" clearable
-                    ><el-option
-                        v-for="item in statuses"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value" /></el-select
-                ><el-button type="primary" @click="load">查询</el-button>
-            </div>
-        </div>
-        <el-table class="project-data-table" :data="rows" border stripe
+    <div class="document-page">
+            <el-form :inline="true" :model="query" class="filter-form" @submit.native.prevent>
+                <el-form-item label="项目编号">
+                    <el-input v-model.trim="query.code" clearable placeholder="请输入项目编号" />
+                </el-form-item>
+                <el-form-item label="项目名称">
+                    <el-input v-model.trim="query.name" clearable placeholder="请输入项目名称" />
+                </el-form-item>
+                <el-form-item label="项目状态">
+                    <el-select v-model="query.status" clearable placeholder="请选择项目状态">
+                        <el-option
+                            v-for="item in statuses"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
+                    <el-button icon="el-icon-refresh-left" @click="resetSearch">重置</el-button>
+                    <el-button type="primary" icon="el-icon-plus" @click="$router.push('/projectAdd')"
+                        >新增</el-button
+                    >
+                </el-form-item>
+            </el-form>
+        <div class="table-wrapper">
+        <el-table class="project-data-table rounded-table" v-loading="loading" :data="rows" height="100%" border stripe
             ><el-table-column type="index" width="55" label="序号" align="center" /><el-table-column
                 prop="code"
                 label="项目编号"
@@ -49,25 +57,16 @@
                 ></el-table-column
             ></el-table
         >
+        </div>
         <el-pagination
             background
-            layout="total, sizes, prev, pager, next"
+            layout="total, sizes, prev, pager, next, jumper"
             :total="total"
             :page-size="query.pageSize"
             :current-page="query.pageNo"
-            @current-change="
-                v => {
-                    query.pageNo = v
-                    load()
-                }
-            "
-            @size-change="
-                v => {
-                    query.pageSize = v
-                    query.pageNo = 1
-                    load()
-                }
-            "
+            :page-sizes="[10, 20, 50, 100]"
+            @current-change="pageChange"
+            @size-change="sizeChange"
         />
     </div>
 </template>
@@ -75,6 +74,7 @@
 export default {
     data() {
         return {
+            loading: false,
             rows: [],
             total: 0,
             query: { pageNo: 1, pageSize: 10, code: '', name: '', status: '' },
@@ -98,11 +98,35 @@ export default {
             return x ? x.label : v
         },
         async load() {
-            let r = await this.$axios.get('project/queryByPage', { params: this.query })
-            if (r.data.code === 200) {
-                this.rows = r.data.data.list
-                this.total = r.data.data.total
+            this.loading = true
+            try {
+                let r = await this.$axios.get('project/queryByPage', { params: this.query })
+                if (r.data.code === 200) {
+                    this.rows = r.data.data.list
+                    this.total = r.data.data.total
+                }
+            } finally {
+                this.loading = false
             }
+        },
+        search() {
+            this.query.pageNo = 1
+            this.load()
+        },
+        resetSearch() {
+            this.query.code = ''
+            this.query.name = ''
+            this.query.status = ''
+            this.search()
+        },
+        pageChange(pageNo) {
+            this.query.pageNo = pageNo
+            this.load()
+        },
+        sizeChange(pageSize) {
+            this.query.pageSize = pageSize
+            this.query.pageNo = 1
+            this.load()
         },
         start(row) {
             this.$confirm('确认启动项目“' + row.name + '”吗？', '提示', { type: 'warning' }).then(async () => {
@@ -126,25 +150,35 @@ export default {
 }
 </script>
 <style scoped>
-.page {
-    padding: 20px;
-}
-.toolbar {
+.document-page {
+    padding: 20px 12px 12px 12px;
+    height: 100%;
+    overflow: hidden;
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
+    flex-direction: column;
+    box-sizing: border-box;
 }
-.filters {
-    display: flex;
-    gap: 10px;
+.filter-form {
+    margin-bottom: 4px;
+    flex: none;
 }
-.filters .el-input,
-.filters .el-select {
-    width: 160px;
+.filter-form .el-input,
+.filter-form .el-select {
+    width: 170px;
 }
 .el-pagination {
     margin-top: 16px;
     text-align: right;
+    flex: none;
+}
+.rounded-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+.table-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 ::v-deep .project-data-table .el-table__cell {
     text-align: center;

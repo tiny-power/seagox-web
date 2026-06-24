@@ -1,7 +1,5 @@
 <template>
     <div class="document-page">
-        <el-card shadow="never">
-            <div slot="header" class="card-header"><span>请款单</span></div>
             <el-form :inline="true" :model="query" class="filter-form" @submit.native.prevent>
                 <el-form-item label="项目名称">
                     <el-select
@@ -43,10 +41,13 @@
                     ><el-button icon="el-icon-refresh" @click="reset">重置</el-button></el-form-item
                 >
             </el-form>
+            <div class="table-wrapper">
             <el-table
+                class="rounded-table"
                 v-loading="loading"
                 :data="rows"
                 :row-style="{ cursor: 'pointer' }"
+                height="100%"
                 border
                 stripe
                 @row-dblclick="view"
@@ -123,6 +124,7 @@
                     <template slot-scope="scope">{{ formatValue(scope.row.createdAt) }}</template>
                 </el-table-column>
             </el-table>
+            </div>
             <el-pagination
                 background
                 layout="total, sizes, prev, pager, next, jumper"
@@ -133,7 +135,6 @@
                 @current-change="pageChange"
                 @size-change="sizeChange"
             />
-        </el-card>
     </div>
 </template>
 
@@ -254,13 +255,15 @@ export default {
 <style scoped>
 .document-page {
     padding: 20px;
-}
-.card-header {
-    font-size: 16px;
-    font-weight: 600;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 .filter-form {
     margin-bottom: 4px;
+    flex: none;
 }
 .filter-form .el-input,
 .filter-form .el-select {
@@ -269,8 +272,18 @@ export default {
 .filter-form .el-date-editor {
     width: 250px;
 }
+.rounded-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+.table-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
 .el-pagination {
     margin-top: 16px;
     text-align: right;
+    flex: none;
 }
 </style>
