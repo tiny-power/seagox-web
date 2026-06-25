@@ -40,7 +40,9 @@
                     align="center"
                     show-overflow-tooltip
                 />
-                <el-table-column prop="version" label="版本" width="100" align="center" />
+                <el-table-column label="版本" width="100" align="center">
+                    <template slot-scope="scope">{{ versionLabel(scope.row.version) }}</template>
+                </el-table-column>
                 <el-table-column
                     prop="solutionExplanation"
                     label="方案说明"
@@ -56,8 +58,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="updatedAt" label="更新时间" width="170" align="center" />
-                <el-table-column label="操作" width="380" align="center" fixed="right">
+                <el-table-column label="操作" width="440" align="center" fixed="right">
                     <template slot-scope="scope">
+                        <el-button type="text" size="small" @click="openDetail(scope.row)">版本记录</el-button>
                         <el-button type="text" size="small" @click="openForm(scope.row)">编辑</el-button>
                         <el-button type="text" size="small" @click="submit(scope.row)" v-if="scope.row.status === 1"
                             >提交</el-button
@@ -159,6 +162,55 @@
             </span>
         </el-dialog>
 
+        <el-dialog title="版本记录" :visible.sync="detailVisible" width="860px">
+            <div v-loading="detailLoading" class="version-dialog">
+                <el-empty v-if="!detailVersions.length && !detailLoading" description="暂无版本记录"></el-empty>
+                <div class="version-record" v-for="item in detailVersions" :key="item.id">
+                    <div class="version-record__head">
+                        <span class="version-record__title">{{ versionLabel(item.version) }}</span>
+                        <span class="version-record__time">{{ item.updatedAt || item.createdAt || '-' }}</span>
+                    </div>
+                    <div class="version-record__content">
+                        <div class="detail-row">
+                            <span class="detail-label">方案说明</span>
+                            <span class="detail-value">{{ item.solutionExplanation || '-' }}</span>
+                        </div>
+                        <div class="detail-row" v-if="item.annotation">
+                            <span class="detail-label">修改注释</span>
+                            <span class="detail-value">{{ item.annotation }}</span>
+                        </div>
+                        <div class="detail-row" v-if="item.defrostExplanation">
+                            <span class="detail-label">解冻说明</span>
+                            <span class="detail-value">{{ item.defrostExplanation }}</span>
+                        </div>
+                        <div class="detail-row" v-if="item.signatureUrl">
+                            <span class="detail-label">签字文件</span>
+                            <a class="detail-link" :href="item.signatureUrl" target="_blank">打开签字文件</a>
+                        </div>
+                        <div class="attachment-list">
+                            <div class="attachment-item" v-for="file in parseAttachments(item.attachments)" :key="file.url">
+                                <el-image
+                                    v-if="isImage(file)"
+                                    class="attachment-thumb"
+                                    :src="file.url"
+                                    :preview-src-list="imageUrls(item.attachments)"
+                                    fit="cover"
+                                />
+                                <div v-else class="attachment-file">
+                                    <i class="el-icon-document"></i>
+                                </div>
+                                <div class="attachment-info">
+                                    <a :href="file.url" target="_blank" class="attachment-name">{{ file.name || '附件' }}</a>
+                                    <span>{{ file.type || '-' }}</span>
+                                    <span>{{ formatSize(file.size) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </el-dialog>
+
         <el-dialog title="冻结方案" :visible.sync="freezeVisible" width="520px">
             <el-form label-width="100px">
                 <el-form-item label="签字文件">
@@ -224,6 +276,9 @@ export default {
             formVisible: false,
             form: this.createForm(),
             fileList: [],
+            detailVisible: false,
+            detailLoading: false,
+            detailVersions: [],
             activeRow: null,
             freezeVisible: false,
             signatureUrl: '',
@@ -262,6 +317,9 @@ export default {
         statusType(status) {
             return { 2: 'warning', 3: 'primary', 4: 'success', 5: 'warning', 6: 'success' }[Number(status)] || 'info'
         },
+        versionLabel(version) {
+            return Number(version) > 0 ? `V${Number(version)}.0` : '-'
+        },
         parseAttachments(value) {
             if (Array.isArray(value)) return value
             if (!value) return []
@@ -271,6 +329,23 @@ export default {
             } catch (error) {
                 return []
             }
+        },
+        isImage(file) {
+            const type = (file && file.type) || ''
+            const url = (file && file.url) || ''
+            return type.indexOf('image/') === 0 || /\.(png|jpe?g|gif|webp|bmp)$/i.test(url)
+        },
+        imageUrls(attachments) {
+            return this.parseAttachments(attachments)
+                .filter(item => this.isImage(item))
+                .map(item => item.url)
+        },
+        formatSize(size) {
+            const value = Number(size)
+            if (!value) return '-'
+            if (value < 1024) return `${value}B`
+            if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)}KB`
+            return `${(value / 1024 / 1024).toFixed(1)}MB`
         },
         syncFileList() {
             this.fileList = this.form.attachments.map((item, index) => ({
@@ -282,6 +357,7 @@ export default {
         buildPayload() {
             return {
                 ...this.form,
+                version: String(this.form.version || '').replace(/^[vV]/, '').split('.')[0] || 1,
                 attachments: JSON.stringify(this.form.attachments),
                 userId: localStorage.getItem('userId')
             }
@@ -328,12 +404,26 @@ export default {
             this.query.pageNo = 1
             this.load()
         },
+        async openDetail(row) {
+            this.detailVisible = true
+            this.detailLoading = true
+            this.detailVersions = []
+            try {
+                const response = await this.$axios.get(`solutionDesign/queryById/${row.id}`)
+                if (response.data.code === 200) {
+                    const data = response.data.data || {}
+                    this.detailVersions = data.details || []
+                } else this.$message.error(response.data.message || '详情查询失败')
+            } finally {
+                this.detailLoading = false
+            }
+        },
         openForm(row) {
             this.form = row
                 ? {
                       id: row.id,
                       projectId: row.projectId,
-                      version: row.version,
+                      version: this.nextEditableVersion(row),
                       attachments: this.parseAttachments(row.attachments),
                       solutionExplanation: row.solutionExplanation,
                       annotation: row.annotation || ''
@@ -342,6 +432,10 @@ export default {
             this.syncFileList()
             this.formVisible = true
             this.$nextTick(() => this.$refs.form && this.$refs.form.clearValidate())
+        },
+        nextEditableVersion(row) {
+            const version = Number(row.version) || 1
+            return row.status === 1 && row.defrostExplanation ? version + 1 : version
         },
         async uploadImage(option) {
             const formData = new FormData()
@@ -542,5 +636,97 @@ export default {
 .message-content {
     color: #303133;
     line-height: 1.6;
+}
+.version-dialog {
+    min-height: 160px;
+}
+.version-record {
+    padding: 14px 0;
+    border-bottom: 1px solid #ebeef5;
+}
+.version-record:last-child {
+    border-bottom: 0;
+}
+.version-record__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.version-record__title {
+    color: #303133;
+    font-size: 15px;
+    font-weight: 600;
+}
+.version-record__time {
+    color: #909399;
+    font-size: 12px;
+}
+.detail-row {
+    display: flex;
+    margin-bottom: 8px;
+    color: #606266;
+    line-height: 1.6;
+}
+.detail-label {
+    flex: none;
+    width: 72px;
+    color: #909399;
+}
+.detail-value {
+    flex: 1;
+    word-break: break-word;
+}
+.detail-link,
+.attachment-name {
+    color: #409eff;
+    text-decoration: none;
+}
+.attachment-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+.attachment-item {
+    display: flex;
+    min-width: 0;
+    padding: 8px;
+    border: 1px solid #ebeef5;
+    border-radius: 6px;
+    background: #fafafa;
+}
+.attachment-thumb,
+.attachment-file {
+    flex: none;
+    width: 54px;
+    height: 54px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.attachment-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #909399;
+    font-size: 26px;
+    background: #f0f2f5;
+}
+.attachment-info {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 8px;
+    color: #909399;
+    font-size: 12px;
+    line-height: 1.6;
+}
+.attachment-name {
+    overflow: hidden;
+    color: #303133;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
