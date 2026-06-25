@@ -121,6 +121,14 @@ const routes = [
                 }
             },
             {
+                name: 'disk',
+                path: '/disk',
+                component: () => import('@/views/system/disk'),
+                meta: {
+                    title: '知识库'
+                }
+            },
+            {
                 name: 'todoItem',
                 path: '/todoItem',
                 component: () => import('@/views/system/todo-item'),
