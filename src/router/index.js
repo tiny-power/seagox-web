@@ -113,6 +113,18 @@ const routes = [
             { name: 'projectHandover', path: '/projectHandover', component: () => import('@/views/business/project-handover'), meta: { title: '交接单' } },
             { name: 'projectHandoverDetail', path: '/projectHandoverDetail', component: () => import('@/views/business/project-handover/detail'), meta: { title: '交接单详情' } },
             {
+                name: 'requirement',
+                path: '/requirement',
+                component: () => import('@/views/business/requirement'),
+                meta: { title: '需求沟通' }
+            },
+            {
+                name: 'solutionDesign',
+                path: '/solutionDesign',
+                component: () => import('@/views/business/solution-design'),
+                meta: { title: '方案设计' }
+            },
+            {
                 name: 'message',
                 path: '/message',
                 component: () => import('@/views/system/message'),

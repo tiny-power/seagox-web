@@ -64,7 +64,7 @@
                 </el-table-column>
                 <el-table-column label="类型" width="110" align="center" :formatter="typeFormatter"></el-table-column>
                 <el-table-column label="大小" width="120" align="center" :formatter="sizeFormatter"></el-table-column>
-                <el-table-column prop="updateTime" label="更新时间" width="180" align="center"></el-table-column>
+                <el-table-column prop="updatedAt" label="更新时间" width="180" align="center"></el-table-column>
                 <el-table-column label="操作" width="240" align="center">
                     <template slot-scope="scope">
                         <el-button type="text" size="small" @click="previewFile(scope.row)" v-if="scope.row.type !== 1"
@@ -179,6 +179,7 @@ export default {
                 if (!valid) return
                 const params = {
                     companyId: localStorage.getItem('companyId'),
+                    userId: localStorage.getItem('userId'),
                     parentId: this.currentFolder && this.currentFolder.id,
                     name: this.folderForm.name
                 }
@@ -202,6 +203,7 @@ export default {
                 }
                 const saveRes = await this.$axios.post('disk/insertFile', {
                     companyId: localStorage.getItem('companyId'),
+                    userId: localStorage.getItem('userId'),
                     parentId: this.currentFolder && this.currentFolder.id,
                     name: option.file.name,
                     url: uploadRes.data.data,
@@ -231,6 +233,7 @@ export default {
                 if (!valid) return
                 const res = await this.$axios.post('disk/update', {
                     companyId: localStorage.getItem('companyId'),
+                    userId: localStorage.getItem('userId'),
                     id: this.renameForm.id,
                     name: this.renameForm.name
                 })
