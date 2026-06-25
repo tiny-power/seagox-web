@@ -125,6 +125,18 @@ const routes = [
                 meta: { title: '方案设计' }
             },
             {
+                name: 'constructionDrawing',
+                path: '/constructionDrawing',
+                component: () => import('@/views/business/construction-drawing'),
+                meta: { title: '施工图出图' }
+            },
+            {
+                name: 'repair',
+                path: '/repair',
+                component: () => import('@/views/business/repair'),
+                meta: { title: '报修单' }
+            },
+            {
                 name: 'message',
                 path: '/message',
                 component: () => import('@/views/system/message'),
