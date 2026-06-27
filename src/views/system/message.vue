@@ -25,7 +25,7 @@
                         <span v-else>{{ scope.row.title }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="createTime" label="发送时间" align="center"></el-table-column>
+                <el-table-column prop="createAt" label="发送时间" align="center"></el-table-column>
                 <el-table-column
                     prop="status"
                     label="状态"
