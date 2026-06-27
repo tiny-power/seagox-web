@@ -139,7 +139,7 @@
                         <template slot-scope="scope">
                             <el-select v-model="scope.row.flowType">
                                 <el-option
-                                    v-for="item in phaseOptions.slice(1)"
+                                    v-for="item in flowTypeOptions"
                                     :key="item.value"
                                     :label="item.label"
                                     :value="item.value"
@@ -357,6 +357,11 @@ export default {
                 { label: '精装', value: 4 },
                 { label: '交付', value: 5 },
                 { label: '售后', value: 6 }
+            ],
+            flowTypeOptions: [
+                { label: '设计', value: 1 },
+                { label: '土建', value: 2 },
+                { label: '精装', value: 3 }
             ],
             roleOptions: [
                 { label: '设计师', value: 1 },

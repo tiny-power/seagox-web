@@ -97,21 +97,117 @@ const routes = [
                     title: '编辑用户'
                 }
             },
-            { name: 'project', path: '/project', component: () => import('@/views/business/project/project'), meta: { title: '项目管理' } },
-            { name: 'projectAdd', path: '/projectAdd', component: () => import('@/views/business/project/project-add'), meta: { title: '新增项目' } },
-            { name: 'projectEdit', path: '/projectEdit', component: () => import('@/views/business/project/project-edit'), meta: { title: '编辑项目' } },
-            { name: 'constructionLog', path: '/constructionLog', component: () => import('@/views/business/construction-log'), meta: { title: '施工日志' } },
-            { name: 'constructionLogDetail', path: '/constructionLogDetail', component: () => import('@/views/business/construction-log/detail'), meta: { title: '施工日志详情' } },
-            { name: 'inspection', path: '/inspection', component: () => import('@/views/business/inspection'), meta: { title: '验收单' } },
-            { name: 'inspectionDetail', path: '/inspectionDetail', component: () => import('@/views/business/inspection/detail'), meta: { title: '验收单详情' } },
-            { name: 'issueTicket', path: '/issueTicket', component: () => import('@/views/business/issue-ticket'), meta: { title: '问题单' } },
-            { name: 'issueTicketDetail', path: '/issueTicketDetail', component: () => import('@/views/business/issue-ticket/detail'), meta: { title: '问题单详情' } },
-            { name: 'paymentRequest', path: '/paymentRequest', component: () => import('@/views/business/payment-request'), meta: { title: '请款单' } },
-            { name: 'paymentRequestDetail', path: '/paymentRequestDetail', component: () => import('@/views/business/payment-request/detail'), meta: { title: '请款单详情' } },
-            { name: 'materialArrival', path: '/materialArrival', component: () => import('@/views/business/material-arrival'), meta: { title: '材料到场' } },
-            { name: 'materialArrivalDetail', path: '/materialArrivalDetail', component: () => import('@/views/business/material-arrival/detail'), meta: { title: '材料到场详情' } },
-            { name: 'projectHandover', path: '/projectHandover', component: () => import('@/views/business/project-handover'), meta: { title: '交接单' } },
-            { name: 'projectHandoverDetail', path: '/projectHandoverDetail', component: () => import('@/views/business/project-handover/detail'), meta: { title: '交接单详情' } },
+            { 
+                name: 'project', 
+                path: '/project', 
+                component: () => import('@/views/business/project/project'), 
+                meta: { 
+                    title: '项目管理' 
+                } 
+            },
+            { 
+                name: 'projectAdd', 
+                path: '/projectAdd', component: () => import('@/views/business/project/project-add'), 
+                meta: { 
+                    title: '新增项目' 
+                } 
+            },
+            { 
+                name: 'projectEdit', path: '/projectEdit', 
+                component: () => import('@/views/business/project/project-edit'), 
+                meta: { 
+                    title: '编辑项目' 
+                } 
+            },
+            { 
+                name: 'constructionLog', path: '/constructionLog', 
+                component: () => import('@/views/business/construction-log'), 
+                meta: { 
+                    title: '施工日志' 
+                } 
+            },
+            { 
+                name: 'constructionLogDetail', path: '/constructionLogDetail', 
+                component: () => import('@/views/business/construction-log/detail'), 
+                meta: { 
+                    title: '施工日志详情' 
+                } 
+            },
+            { 
+                name: 'inspection', path: '/inspection', 
+                component: () => import('@/views/business/inspection'), 
+                meta: { 
+                    title: '验收单' 
+                } 
+            },
+            { 
+                name: 'inspectionDetail', path: '/inspectionDetail', 
+                component: () => import('@/views/business/inspection/detail'), 
+                meta: { 
+                    title: '验收单详情' 
+                } 
+            },
+            { 
+                name: 'issueTicket', path: '/issueTicket', 
+                component: () => import('@/views/business/issue-ticket'), 
+                meta: { 
+                    title: '问题单' 
+                } 
+            },
+            { 
+                name: 'issueTicketDetail', path: '/issueTicketDetail', 
+                component: () => import('@/views/business/issue-ticket/detail'), 
+                meta: { 
+                    title: '问题单详情' 
+                } 
+            },
+            { 
+                name: 'paymentRequest', path: '/paymentRequest', 
+                component: () => import('@/views/business/payment-request'), 
+                meta: { 
+                    title: '请款单' 
+                } 
+            },
+            { 
+                name: 'paymentRequestDetail', 
+                path: '/paymentRequestDetail', 
+                component: () => import('@/views/business/payment-request/detail'), 
+                meta: { 
+                    title: '请款单详情' 
+                } 
+            },
+            { 
+                name: 'materialArrival', 
+                path: '/materialArrival', 
+                component: () => import('@/views/business/material-arrival'), 
+                meta: { 
+                    title: '材料到场' 
+                } 
+            },
+            { 
+                name: 'materialArrivalDetail', 
+                path: '/materialArrivalDetail', 
+                component: () => import('@/views/business/material-arrival/detail'), 
+                meta: { 
+                    title: '材料到场详情' 
+                } 
+            },
+            { 
+                name: 'projectHandover', 
+                path: '/projectHandover', 
+                component: () => import('@/views/business/project-handover'), 
+                meta: { 
+                    title: '交接单' 
+                } 
+            },
+            { 
+                name: 'projectHandoverDetail', 
+                path: '/projectHandoverDetail', 
+                component: () => import('@/views/business/project-handover/detail'), 
+                meta: { 
+                    title: '交接单详情' 
+                } 
+            },
             {
                 name: 'requirement',
                 path: '/requirement',

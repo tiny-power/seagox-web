@@ -1,53 +1,183 @@
 [
   {
-    "value": 2,
+    "value": 1,
     "label": "设计",
     "stages": [
       {
         "stageName": "前期沟通",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "客户需求记录完整",
+            "status": 0
+          },
+          {
+            "name": "项目基础资料收集齐全",
+            "status": 0
+          },
+          {
+            "name": "现场条件及限制因素已确认",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "方案设计",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "平面布局满足功能需求",
+            "status": 0
+          },
+          {
+            "name": "设计风格及效果方向已确认",
+            "status": 0
+          },
+          {
+            "name": "主要材料及工艺方向明确",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "方案深化确认",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "深化方案与客户确认意见一致",
+            "status": 0
+          },
+          {
+            "name": "关键节点尺寸及做法明确",
+            "status": 0
+          },
+          {
+            "name": "预算范围与方案内容匹配",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "施工图出图",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "施工图纸完整齐全",
+            "status": 0
+          },
+          {
+            "name": "图纸标注及尺寸清晰准确",
+            "status": 0
+          },
+          {
+            "name": "各专业图纸无明显冲突",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "设计归档",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "最终确认图纸已归档",
+            "status": 0
+          },
+          {
+            "name": "方案确认记录已归档",
+            "status": 0
+          },
+          {
+            "name": "设计变更资料已整理完整",
+            "status": 0
+          }
+        ]
       }
     ]
   },
   {
-    "value": 3,
+    "value": 2,
     "label": "土建",
     "stages": [
       {
         "stageName": "场地勘测与承载力测试",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "场地边界及标高复核完成",
+            "status": 0
+          },
+          {
+            "name": "地质及承载力测试结果合格",
+            "status": 0
+          },
+          {
+            "name": "地下管线及障碍物情况已确认",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "图纸会审",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "各专业图纸会审完成",
+            "status": 0
+          },
+          {
+            "name": "图纸疑问及变更意见已记录",
+            "status": 0
+          },
+          {
+            "name": "施工边界及接口条件明确",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "施工方案",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "施工组织方案完整",
+            "status": 0
+          },
+          {
+            "name": "质量、安全及进度措施明确",
+            "status": 0
+          },
+          {
+            "name": "材料设备及人员计划满足施工要求",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "班组合同",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "班组施工范围明确",
+            "status": 0
+          },
+          {
+            "name": "质量标准及验收要求已约定",
+            "status": 0
+          },
+          {
+            "name": "工期、付款及安全责任条款完整",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "开工",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "开工手续及交底资料齐全",
+            "status": 0
+          },
+          {
+            "name": "施工人员及机械设备到位",
+            "status": 0
+          },
+          {
+            "name": "现场安全防护及临设施置完成",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "地基基础验收",
@@ -94,7 +224,24 @@
       },
       {
         "stageName": "混凝土浇筑及养护",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "混凝土强度等级及配合比符合要求",
+            "status": 0
+          },
+          {
+            "name": "浇筑振捣密实无明显缺陷",
+            "status": 0
+          },
+          {
+            "name": "养护措施及时间符合规范",
+            "status": 0
+          },
+          {
+            "name": "试块留置及施工记录完整",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "主体结构验收",
@@ -120,33 +267,111 @@
       },
       {
         "stageName": "移交精装",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "结构及基层质量满足移交条件",
+            "status": 0
+          },
+          {
+            "name": "预留预埋及洞口位置复核完成",
+            "status": 0
+          },
+          {
+            "name": "移交问题清单及整改责任明确",
+            "status": 0
+          }
+        ]
       }
     ]
   },
   {
-    "value": 4,
+    "value": 3,
     "label": "精装",
     "stages": [
       {
         "stageName": "接收土建移交",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "土建移交资料齐全",
+            "status": 0
+          },
+          {
+            "name": "现场基层及结构条件满足精装进场",
+            "status": 0
+          },
+          {
+            "name": "遗留问题清单及整改计划明确",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "图纸会审",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "装饰、水电、暖通等专业图纸会审完成",
+            "status": 0
+          },
+          {
+            "name": "图纸冲突及现场偏差已记录",
+            "status": 0
+          },
+          {
+            "name": "材料做法及收口节点明确",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "施工方案",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "精装施工工序及节点计划明确",
+            "status": 0
+          },
+          {
+            "name": "样板、材料及工艺标准已确认",
+            "status": 0
+          },
+          {
+            "name": "成品保护及安全文明措施完整",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "班组合同",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "班组施工范围及界面划分明确",
+            "status": 0
+          },
+          {
+            "name": "工艺标准及质量验收要求已约定",
+            "status": 0
+          },
+          {
+            "name": "工期、付款及售后责任条款完整",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "开工",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "开工交底及施工计划确认完成",
+            "status": 0
+          },
+          {
+            "name": "材料样板及进场计划明确",
+            "status": 0
+          },
+          {
+            "name": "现场安全防护及成品保护到位",
+            "status": 0
+          }
+        ]
       },
       {
         "stageName": "砌筑验收",
@@ -351,7 +576,20 @@
       },
       {
         "stageName": "交付",
-        "inspectionItems": []
+        "inspectionItems": [
+          {
+            "name": "交付资料及保修文件齐全",
+            "status": 0
+          },
+          {
+            "name": "客户交付验收确认完成",
+            "status": 0
+          },
+          {
+            "name": "钥匙、设备及使用说明移交完成",
+            "status": 0
+          }
+        ]
       }
     ]
   }
