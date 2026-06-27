@@ -105,6 +105,14 @@ const routes = [
                     title: '项目管理' 
                 } 
             },
+            {
+                name: 'finance',
+                path: '/finance',
+                component: () => import('@/views/business/finance'),
+                meta: {
+                    title: '财务管理'
+                }
+            },
             { 
                 name: 'projectAdd', 
                 path: '/projectAdd', component: () => import('@/views/business/project/project-add'), 
