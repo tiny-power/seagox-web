@@ -1,7 +1,7 @@
 [
   {
-    "value": 1,
-    "label": "设计",
+    "value": 4,
+    "label": "筹备",
     "stages": [
       {
         "stageName": "前期沟通",
@@ -20,6 +20,63 @@
           }
         ]
       },
+      {
+        "stageName": "立项建档",
+        "inspectionItems": [
+          {
+            "name": "项目基础信息已建档",
+            "status": 0
+          },
+          {
+            "name": "业主及联系人信息已确认",
+            "status": 0
+          },
+          {
+            "name": "项目预算及交付目标已记录",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "合同签约",
+        "inspectionItems": [
+          {
+            "name": "合同范围及服务内容明确",
+            "status": 0
+          },
+          {
+            "name": "付款节点及交付节点已确认",
+            "status": 0
+          },
+          {
+            "name": "合同及补充协议资料已归档",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "项目启动会",
+        "inspectionItems": [
+          {
+            "name": "项目团队及职责分工明确",
+            "status": 0
+          },
+          {
+            "name": "总体计划及关键节点已确认",
+            "status": 0
+          },
+          {
+            "name": "沟通机制及会议频率已约定",
+            "status": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "value": 1,
+    "label": "设计",
+    "stages": [
       {
         "stageName": "方案设计",
         "inspectionItems": [
@@ -573,20 +630,117 @@
             "status": 0
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    "value": 5,
+    "label": "交付",
+    "stages": [
       {
-        "stageName": "交付",
+        "stageName": "交付准备",
         "inspectionItems": [
           {
             "name": "交付资料及保修文件齐全",
             "status": 0
           },
           {
+            "name": "设备说明及使用手册整理完成",
+            "status": 0
+          },
+          {
+            "name": "钥匙、门禁及物品移交清单完整",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "客户交付验收",
+        "inspectionItems": [
+          {
             "name": "客户交付验收确认完成",
             "status": 0
           },
           {
-            "name": "钥匙、设备及使用说明移交完成",
+            "name": "交付问题清单已记录",
+            "status": 0
+          },
+          {
+            "name": "整改责任人及完成时间已明确",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "交付归档",
+        "inspectionItems": [
+          {
+            "name": "交付确认单已归档",
+            "status": 0
+          },
+          {
+            "name": "竣工资料及验收记录已归档",
+            "status": 0
+          },
+          {
+            "name": "售后服务说明已同步业主",
+            "status": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "value": 6,
+    "label": "售后",
+    "stages": [
+      {
+        "stageName": "售后回访",
+        "inspectionItems": [
+          {
+            "name": "回访时间及回访人已记录",
+            "status": 0
+          },
+          {
+            "name": "业主反馈问题已整理",
+            "status": 0
+          },
+          {
+            "name": "无需处理事项已确认关闭",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "维修处理",
+        "inspectionItems": [
+          {
+            "name": "维修责任及处理方案明确",
+            "status": 0
+          },
+          {
+            "name": "维修人员及材料安排完成",
+            "status": 0
+          },
+          {
+            "name": "维修完成结果已确认",
+            "status": 0
+          }
+        ]
+      },
+      {
+        "stageName": "售后关闭",
+        "inspectionItems": [
+          {
+            "name": "售后问题处理记录完整",
+            "status": 0
+          },
+          {
+            "name": "业主确认结果已留存",
+            "status": 0
+          },
+          {
+            "name": "售后档案已归档",
             "status": 0
           }
         ]

@@ -37,14 +37,6 @@
                             :min="0"
                             :precision="2"
                             :controls="false" /></el-form-item></el-col
-                ><el-col :span="8"
-                    ><el-form-item label="当前阶段"
-                        ><el-select v-model="form.currentPhase" disabled clearable
-                            ><el-option
-                                v-for="i in phaseOptions"
-                                :key="i.value"
-                                :label="i.label"
-                                :value="i.value" /></el-select></el-form-item></el-col
             ></el-row>
             <el-row :gutter="20"
                 ><el-col :span="8"
@@ -335,7 +327,6 @@ export default {
                 ownerPhone: '',
                 budgetAmount: 0,
                 status: 1,
-                currentPhase: 1,
                 healthStatus: 1,
                 pauseReason: '',
                 cancelReason: '',
@@ -362,18 +353,13 @@ export default {
                 { label: '已完结', value: 6 },
                 { label: '已取消', value: 7 }
             ],
-            phaseOptions: [
-                { label: '筹备', value: 1 },
-                { label: '设计', value: 2 },
-                { label: '土建', value: 3 },
-                { label: '精装', value: 4 },
-                { label: '交付', value: 5 },
-                { label: '售后', value: 6 }
-            ],
             flowTypeOptions: [
+                { label: '筹备', value: 4 },
                 { label: '设计', value: 1 },
                 { label: '土建', value: 2 },
-                { label: '精装', value: 3 }
+                { label: '精装', value: 3 },
+                { label: '交付', value: 5 },
+                { label: '售后', value: 6 }
             ],
             roleOptions: [
                 { label: '设计师', value: 1 },
@@ -405,7 +391,7 @@ export default {
             return {
                 key,
                 stageName: '',
-                flowType: 2,
+                flowType: null,
                 sortOrder: this.stages.length + 1,
                 status: 1,
                 managerUserId: null,
@@ -588,8 +574,8 @@ export default {
                     this.activeTab = 'stages'
                     return this.$message.warning('请至少添加一个项目阶段')
                 }
-                if (this.stages.some(x => !x.stageName || !x.flowType))
-                    return this.$message.warning('请完善项目阶段信息')
+                if (this.stages.some(x => !x.stageName)) return this.$message.warning('请输入项目阶段名称')
+                if (this.stages.some(x => !x.flowType)) return this.$message.warning('请选择项目阶段流程类型')
                 if (this.stages.some(x => !x.plannedStartDate || !x.plannedEndDate)) {
                     this.activeTab = 'stages'
                     return this.$message.warning('请填写项目阶段计划开始日期和计划完成日期')
