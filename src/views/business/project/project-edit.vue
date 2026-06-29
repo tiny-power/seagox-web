@@ -23,6 +23,14 @@
                     ><el-form-item label="项目地址" prop="address"
                         ><el-input v-model="form.address" clearable /></el-form-item></el-col
                 ><el-col :span="8"
+                    ><el-form-item label="业主姓名" prop="ownerName"
+                        ><el-input v-model="form.ownerName" clearable /></el-form-item></el-col
+                ><el-col :span="8"
+                    ><el-form-item label="联系电话" prop="ownerPhone"
+                        ><el-input v-model="form.ownerPhone" clearable /></el-form-item></el-col
+            ></el-row>
+            <el-row :gutter="20"
+                ><el-col :span="8"
                     ><el-form-item label="预算金额"
                         ><el-input-number
                             v-model="form.budgetAmount"
@@ -323,6 +331,8 @@ export default {
                 cover: '',
                 name: '',
                 address: '',
+                ownerName: '',
+                ownerPhone: '',
                 budgetAmount: 0,
                 status: 1,
                 currentPhase: 1,
@@ -337,6 +347,8 @@ export default {
                 code: [{ required: true, message: '请输入项目编号', trigger: 'blur' }],
                 name: [{ required: true, message: '请输入项目名称', trigger: 'blur' }],
                 address: [{ required: true, message: '请输入项目地址', trigger: 'blur' }],
+                ownerName: [{ required: true, message: '请输入业主姓名', trigger: 'blur' }],
+                ownerPhone: [{ required: true, message: '请输入业主联系电话', trigger: 'blur' }],
                 status: [{ required: true, message: '请选择状态', trigger: 'change' }],
                 plannedStartDate: [{ required: true, message: '请选择计划开始日期', trigger: 'change' }],
                 plannedEndDate: [{ required: true, message: '请选择计划结束日期', trigger: 'change' }]

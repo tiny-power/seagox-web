@@ -38,6 +38,11 @@
                 align="center"
                 min-width="200"
                 show-overflow-tooltip
+            /><el-table-column prop="ownerName" label="业主姓名" width="120" align="center" /><el-table-column
+                prop="ownerPhone"
+                label="联系电话"
+                width="140"
+                align="center"
             /><el-table-column prop="budgetAmount" label="预算金额" width="130" align="center" /><el-table-column
                 label="状态"
                 width="110"
