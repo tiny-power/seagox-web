@@ -344,10 +344,10 @@ export default {
                 { label: '已取消', value: 7 }
             ],
             flowTypeOptions: [
-                { label: '筹备', value: 4 },
-                { label: '设计', value: 1 },
-                { label: '土建', value: 2 },
-                { label: '精装', value: 3 },
+                { label: '筹备', value: 1 },
+                { label: '设计', value: 2 },
+                { label: '土建', value: 3 },
+                { label: '精装', value: 4 },
                 { label: '交付', value: 5 },
                 { label: '售后', value: 6 }
             ],

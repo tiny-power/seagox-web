@@ -1,6 +1,6 @@
 [
   {
-    "value": 4,
+    "value": 1,
     "label": "筹备",
     "stages": [
       {
@@ -74,7 +74,7 @@
     ]
   },
   {
-    "value": 1,
+    "value": 2,
     "label": "设计",
     "stages": [
       {
@@ -148,7 +148,7 @@
     ]
   },
   {
-    "value": 2,
+    "value": 3,
     "label": "土建",
     "stages": [
       {
@@ -342,7 +342,7 @@
     ]
   },
   {
-    "value": 3,
+    "value": 4,
     "label": "精装",
     "stages": [
       {
