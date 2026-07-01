@@ -24,11 +24,19 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
                 <el-button icon="el-icon-refresh" @click="reset">重置</el-button>
-                <el-button type="primary" icon="el-icon-plus" @click="openForm()">新增</el-button>
             </el-form-item>
         </el-form>
         <div class="table-wrapper">
-            <el-table class="rounded-table" v-loading="loading" :data="rows" height="100%" border stripe>
+            <el-table
+                class="rounded-table"
+                v-loading="loading"
+                :data="rows"
+                :row-style="{ cursor: 'pointer' }"
+                height="100%"
+                border
+                stripe
+                @row-dblclick="viewDetail"
+            >
                 <el-table-column type="index" label="序号" width="55" align="center" />
                 <el-table-column
                     prop="projectName"
@@ -55,20 +63,6 @@
                 <el-table-column prop="updatedAt" label="更新时间" width="170" align="center" show-overflow-tooltip>
                     <template slot-scope="scope">{{ formatValue(scope.row.updatedAt) }}</template>
                 </el-table-column>
-                <el-table-column label="操作" width="280" align="center" fixed="right">
-                    <template slot-scope="scope">
-                        <el-button type="text" size="small" @click="openForm(scope.row)">编辑</el-button>
-                        <el-button type="text" size="small" @click="submit(scope.row)" v-if="scope.row.status !== 3"
-                            >提交</el-button
-                        >
-                        <el-button type="text" size="small" @click="openSign(scope.row)" v-if="scope.row.status === 2"
-                            >签字</el-button
-                        >
-                        <el-button type="text" size="small" @click="remove(scope.row)" v-if="scope.row.status !== 3"
-                            >删除</el-button
-                        >
-                    </template>
-                </el-table-column>
             </el-table>
         </div>
         <el-pagination
@@ -82,58 +76,23 @@
             @size-change="sizeChange"
         />
 
-        <el-dialog :title="form.id ? '编辑需求沟通' : '新增需求沟通'" :visible.sync="formVisible" width="620px">
-            <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-                <el-form-item label="所属项目" prop="projectId">
-                    <el-select
-                        v-model="form.projectId"
-                        clearable
-                        filterable
-                        remote
-                        :remote-method="loadProjects"
-                        :loading="projectLoading"
-                        placeholder="请选择项目"
-                        class="form-control"
-                    >
-                        <el-option v-for="item in projectOptions" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="风格偏好" prop="style">
-                    <el-input v-model="form.style" maxlength="255" placeholder="请输入风格偏好" />
-                </el-form-item>
-                <el-form-item label="预算范围" prop="budget">
-                    <el-input v-model="form.budget" maxlength="255" placeholder="请输入预算范围" />
-                </el-form-item>
-                <el-form-item label="家庭成员" prop="member">
-                    <el-input v-model="form.member" maxlength="255" placeholder="请输入家庭成员" />
-                </el-form-item>
-                <el-form-item label="特殊需求">
-                    <el-input
-                        v-model="form.mark"
-                        type="textarea"
-                        :rows="4"
-                        maxlength="500"
-                        show-word-limit
-                        placeholder="请输入特殊需求"
-                    />
-                </el-form-item>
-            </el-form>
-            <span slot="footer">
-                <el-button @click="formVisible = false">取消</el-button>
-                <el-button type="primary" :loading="saving" @click="save">保存</el-button>
-            </span>
-        </el-dialog>
-
-        <el-dialog title="签字确认" :visible.sync="signVisible" width="520px">
-            <el-form label-width="100px">
-                <el-form-item label="签字文件">
-                    <el-input v-model="signatureUrl" maxlength="500" placeholder="请输入签字文件地址" />
-                </el-form-item>
-            </el-form>
-            <span slot="footer">
-                <el-button @click="signVisible = false">取消</el-button>
-                <el-button type="primary" :loading="signing" @click="sign">确认</el-button>
-            </span>
+        <el-dialog title="需求沟通详情" :visible.sync="detailVisible" width="720px">
+            <el-descriptions v-if="detail" :column="2" border>
+                <el-descriptions-item label="项目名称">{{ formatValue(detail.projectName) }}</el-descriptions-item>
+                <el-descriptions-item label="状态">{{ formatValue(detail.statusText) }}</el-descriptions-item>
+                <el-descriptions-item label="风格偏好">{{ formatValue(detail.style) }}</el-descriptions-item>
+                <el-descriptions-item label="预算范围">{{ formatValue(detail.budget) }}</el-descriptions-item>
+                <el-descriptions-item label="家庭成员">{{ formatValue(detail.member) }}</el-descriptions-item>
+                <el-descriptions-item label="签字时间">{{ formatValue(detail.signedAt) }}</el-descriptions-item>
+                <el-descriptions-item label="更新时间">{{ formatValue(detail.updatedAt) }}</el-descriptions-item>
+                <el-descriptions-item label="签字文件">
+                    <a v-if="detail.signatureUrl" :href="detail.signatureUrl" target="_blank">打开签字文件</a>
+                    <span v-else>-</span>
+                </el-descriptions-item>
+                <el-descriptions-item label="特殊需求" :span="2">{{
+                    formatValue(detail.mark)
+                }}</el-descriptions-item>
+            </el-descriptions>
         </el-dialog>
     </div>
 </template>
@@ -143,24 +102,13 @@ export default {
     data() {
         return {
             loading: false,
-            saving: false,
-            signing: false,
             projectLoading: false,
             projectOptions: [],
             rows: [],
             total: 0,
             query: this.createQuery(),
-            formVisible: false,
-            form: this.createForm(),
-            signVisible: false,
-            signRow: null,
-            signatureUrl: '',
-            rules: {
-                projectId: [{ required: true, message: '请选择项目', trigger: 'change' }],
-                style: [{ required: true, message: '请输入风格偏好', trigger: 'blur' }],
-                budget: [{ required: true, message: '请输入预算范围', trigger: 'blur' }],
-                member: [{ required: true, message: '请输入家庭成员', trigger: 'blur' }]
-            }
+            detailVisible: false,
+            detail: null
         }
     },
     created() {
@@ -174,16 +122,6 @@ export default {
                 pageSize: 10,
                 projectId: '',
                 status: ''
-            }
-        },
-        createForm() {
-            return {
-                id: '',
-                projectId: '',
-                style: '',
-                budget: '',
-                member: '',
-                mark: ''
             }
         },
         formatValue(value) {
@@ -242,95 +180,9 @@ export default {
             this.query.pageNo = 1
             this.load()
         },
-        openForm(row) {
-            this.form = row
-                ? {
-                      id: row.id,
-                      projectId: row.projectId,
-                      style: row.style,
-                      budget: row.budget,
-                      member: row.member,
-                      mark: row.mark
-                  }
-                : this.createForm()
-            this.formVisible = true
-            this.$nextTick(() => this.$refs.form && this.$refs.form.clearValidate())
-        },
-        save() {
-            this.$refs.form.validate(async valid => {
-                if (!valid) return
-                this.saving = true
-                try {
-                    let response = await this.$axios.post('requirement/save', {
-                        ...this.form,
-                        userId: localStorage.getItem('userId')
-                    })
-                    if (response.data.code === 200) {
-                        this.$message.success('保存成功')
-                        this.formVisible = false
-                        this.load()
-                    } else {
-                        this.$message.error(response.data.message || '保存失败')
-                    }
-                } finally {
-                    this.saving = false
-                }
-            })
-        },
-        submit(row) {
-            this.$confirm('确认提交该需求沟通给业主审核吗？', '提示', { type: 'warning' })
-                .then(async () => {
-                    let response = await this.$axios.post(`requirement/submit/${row.id}`, {
-                        userId: localStorage.getItem('userId')
-                    })
-                    if (response.data.code === 200) {
-                        this.$message.success('提交成功')
-                        this.load()
-                    } else {
-                        this.$message.error(response.data.message || '提交失败')
-                    }
-                })
-                .catch(() => {})
-        },
-        openSign(row) {
-            this.signRow = row
-            this.signatureUrl = row.signatureUrl || ''
-            this.signVisible = true
-        },
-        async sign() {
-            if (!this.signatureUrl) {
-                this.$message.warning('请输入签字文件地址')
-                return
-            }
-            this.signing = true
-            try {
-                let response = await this.$axios.post(`requirement/sign/${this.signRow.id}`, {
-                    signatureUrl: this.signatureUrl,
-                    userId: localStorage.getItem('userId')
-                })
-                if (response.data.code === 200) {
-                    this.$message.success('签字成功')
-                    this.signVisible = false
-                    this.load()
-                } else {
-                    this.$message.error(response.data.message || '签字失败')
-                }
-            } finally {
-                this.signing = false
-            }
-        },
-        remove(row) {
-            this.$confirm('确认删除该需求沟通吗？', '提示', { type: 'warning' })
-                .then(async () => {
-                    let response = await this.$axios.post(`requirement/delete/${row.id}`)
-                    if (response.data.code === 200) {
-                        this.$message.success('删除成功')
-                        this.load()
-                    } else {
-                        this.$message.error(response.data.message || '删除失败')
-                    }
-                })
-                .catch(() => {})
+        viewDetail(row) {
+            this.detail = row
+            this.detailVisible = true
         }
     }
 }
@@ -366,8 +218,5 @@ export default {
     margin-top: 16px;
     text-align: right;
     flex: none;
-}
-.form-control {
-    width: 100%;
 }
 </style>

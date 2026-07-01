@@ -17,7 +17,6 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
                 <el-button icon="el-icon-refresh" @click="reset">重置</el-button>
-                <el-button type="primary" icon="el-icon-plus" @click="openForm()">新增</el-button>
             </el-form-item>
         </el-form>
 
@@ -38,14 +37,10 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="repairAt" label="报修时间" width="170" align="center" />
-                <el-table-column label="操作" width="360" align="center" fixed="right">
+                <el-table-column label="操作" width="120" align="center" fixed="right">
                     <template slot-scope="scope">
                         <el-button type="text" size="small" @click="openDetail(scope.row)">详情</el-button>
-                        <el-button type="text" size="small" @click="openForm(scope.row)" v-if="scope.row.status !== 4">编辑</el-button>
                         <el-button type="text" size="small" @click="openAssign(scope.row)" v-if="scope.row.status !== 4">指派</el-button>
-                        <el-button type="text" size="small" @click="openComplete(scope.row)" v-if="scope.row.status === 2">维修完成</el-button>
-                        <el-button type="text" size="small" @click="confirm(scope.row)" v-if="scope.row.status === 3">确认完成</el-button>
-                        <el-button type="text" size="small" @click="remove(scope.row)" v-if="scope.row.status !== 4">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -61,44 +56,6 @@
             @size-change="sizeChange"
         />
 
-        <el-dialog :title="form.id ? '编辑报修单' : '新增报修单'" :visible.sync="formVisible" width="760px">
-            <el-form ref="form" :model="form" :rules="rules" label-width="110px">
-                <el-form-item label="所属项目" prop="projectId">
-                    <el-select v-model="form.projectId" class="form-control" clearable filterable remote :remote-method="loadProjects" placeholder="请选择项目">
-                        <el-option v-for="item in projectOptions" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="报修类型" prop="type">
-                    <el-select v-model="form.type" class="form-control" placeholder="请选择报修类型">
-                        <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="报修位置" prop="location">
-                    <el-select v-model="form.location" class="form-control" placeholder="请选择报修位置">
-                        <el-option v-for="item in locationOptions" :key="item" :label="item" :value="item" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="问题描述" prop="description">
-                    <el-input v-model="form.description" type="textarea" :rows="4" maxlength="1000" show-word-limit />
-                </el-form-item>
-                <el-form-item label="维修前附件">
-                    <el-upload action="" multiple :file-list="beforeFileList" :http-request="option => uploadFile(option, 'beforeAttachments')" :on-remove="file => removeFile(file, 'beforeAttachments')">
-                        <el-button size="small" type="primary" icon="el-icon-upload2">上传附件</el-button>
-                    </el-upload>
-                </el-form-item>
-                <el-form-item label="联系人" prop="contact">
-                    <el-input v-model.trim="form.contact" maxlength="100" />
-                </el-form-item>
-                <el-form-item label="联系电话" prop="contactNumber">
-                    <el-input v-model.trim="form.contactNumber" maxlength="200" />
-                </el-form-item>
-            </el-form>
-            <span slot="footer">
-                <el-button @click="formVisible = false">取消</el-button>
-                <el-button type="primary" :loading="saving" @click="save">保存</el-button>
-            </span>
-        </el-dialog>
-
         <el-dialog title="指派维修人员" :visible.sync="assignVisible" width="520px">
             <el-form label-width="100px">
                 <el-form-item label="维修人员">
@@ -110,20 +67,6 @@
             <span slot="footer">
                 <el-button @click="assignVisible = false">取消</el-button>
                 <el-button type="primary" :loading="acting" @click="assign">确认</el-button>
-            </span>
-        </el-dialog>
-
-        <el-dialog title="维修完成" :visible.sync="completeVisible" width="640px">
-            <el-form label-width="110px">
-                <el-form-item label="维修后附件">
-                    <el-upload action="" multiple :file-list="afterFileList" :http-request="option => uploadFile(option, 'afterAttachments')" :on-remove="file => removeFile(file, 'afterAttachments')">
-                        <el-button size="small" type="primary" icon="el-icon-upload2">上传附件</el-button>
-                    </el-upload>
-                </el-form-item>
-            </el-form>
-            <span slot="footer">
-                <el-button @click="completeVisible = false">取消</el-button>
-                <el-button type="primary" :loading="acting" @click="complete">提交</el-button>
             </span>
         </el-dialog>
 
@@ -178,39 +121,23 @@ export default {
     data() {
         return {
             loading: false,
-            saving: false,
             acting: false,
             rows: [],
             total: 0,
             query: this.createQuery(),
             projectOptions: [],
             userOptions: [],
-            formVisible: false,
-            form: this.createForm(),
-            beforeFileList: [],
-            afterFileList: [],
             activeRow: null,
             assignVisible: false,
             repairMemberId: '',
-            completeVisible: false,
             detailVisible: false,
             detail: null,
-            typeOptions: ['水电维修', '电路维修', '门窗维修', '家电维修', '墙面地面', '管道疏通', '卫浴洁具', '家具维修', '其他问题'],
-            locationOptions: ['卫生间', '客厅', '卧室', '厨房', '阳台', '其他位置'],
             statusOptions: [
                 { value: 1, label: '已提交' },
                 { value: 2, label: '处理中' },
                 { value: 3, label: '待确认' },
                 { value: 4, label: '已完成' }
-            ],
-            rules: {
-                projectId: [{ required: true, message: '请选择项目', trigger: 'change' }],
-                type: [{ required: true, message: '请选择报修类型', trigger: 'change' }],
-                location: [{ required: true, message: '请选择报修位置', trigger: 'change' }],
-                description: [{ required: true, message: '请填写问题描述', trigger: 'blur' }],
-                contact: [{ required: true, message: '请填写联系人', trigger: 'blur' }],
-                contactNumber: [{ required: true, message: '请填写联系电话', trigger: 'blur' }]
-            }
+            ]
         }
     },
     created() {
@@ -221,9 +148,6 @@ export default {
     methods: {
         createQuery() {
             return { pageNo: 1, pageSize: 10, projectId: '', status: '', keyword: '' }
-        },
-        createForm() {
-            return { id: '', projectId: '', type: '', location: '', description: '', beforeAttachments: [], contact: '', contactNumber: '', afterAttachments: [] }
         },
         statusType(status) {
             return { 2: 'primary', 3: 'warning', 4: 'success' }[Number(status)] || 'info'
@@ -236,23 +160,6 @@ export default {
                 return Array.isArray(data) ? data : []
             } catch (error) {
                 return []
-            }
-        },
-        syncFileLists() {
-            this.beforeFileList = this.form.beforeAttachments.map(file => ({ name: file.name || '附件', url: file.url, response: file }))
-            this.afterFileList = this.form.afterAttachments.map(file => ({ name: file.name || '附件', url: file.url, response: file }))
-        },
-        buildPayload() {
-            return {
-                id: this.form.id,
-                projectId: this.form.projectId,
-                type: this.form.type,
-                location: this.form.location,
-                description: this.form.description,
-                beforeAttachments: JSON.stringify(this.form.beforeAttachments),
-                contact: this.form.contact,
-                contactNumber: this.form.contactNumber,
-                userId: localStorage.getItem('userId')
             }
         },
         async loadProjects(name) {
@@ -295,56 +202,6 @@ export default {
             this.query.pageNo = 1
             this.load()
         },
-        openForm(row) {
-            this.form = row
-                ? {
-                      id: row.id,
-                      projectId: row.projectId,
-                      type: row.type,
-                      location: row.location,
-                      description: row.description,
-                      beforeAttachments: this.parseAttachments(row.beforeAttachments),
-                      contact: row.contact,
-                      contactNumber: row.contactNumber,
-                      afterAttachments: this.parseAttachments(row.afterAttachments)
-                  }
-                : this.createForm()
-            this.syncFileLists()
-            this.formVisible = true
-            this.$nextTick(() => this.$refs.form && this.$refs.form.clearValidate())
-        },
-        async uploadFile(option, key) {
-            const formData = new FormData()
-            formData.append('file', option.file)
-            const response = await this.$axios.post('upload/putObject/oss', formData)
-            if (response.data.code !== 200) {
-                this.$message.error(response.data.message || '上传失败')
-                return
-            }
-            this.form[key].push({ name: option.file.name, type: option.file.type || 'application/octet-stream', url: response.data.data, size: option.file.size })
-            this.syncFileLists()
-        },
-        removeFile(file, key) {
-            this.form[key] = this.form[key].filter(item => item.url !== file.url)
-            this.syncFileLists()
-        },
-        save() {
-            this.$refs.form.validate(async valid => {
-                if (!valid) return
-                this.saving = true
-                try {
-                    const url = this.form.id ? 'repair/update' : 'repair/insert'
-                    const response = await this.$axios.post(url, this.buildPayload())
-                    if (response.data.code === 200) {
-                        this.$message.success('保存成功')
-                        this.formVisible = false
-                        this.load()
-                    } else this.$message.error(response.data.message || '保存失败')
-                } finally {
-                    this.saving = false
-                }
-            })
-        },
         async openDetail(row) {
             const response = await this.$axios.get(`repair/queryById/${row.id}`)
             if (response.data.code === 200) {
@@ -373,46 +230,6 @@ export default {
             } finally {
                 this.acting = false
             }
-        },
-        openComplete(row) {
-            this.activeRow = row
-            this.form.afterAttachments = this.parseAttachments(row.afterAttachments)
-            this.syncFileLists()
-            this.completeVisible = true
-        },
-        async complete() {
-            this.acting = true
-            try {
-                const response = await this.$axios.post(`repair/complete/${this.activeRow.id}`, {
-                    afterAttachments: JSON.stringify(this.form.afterAttachments),
-                    userId: localStorage.getItem('userId')
-                })
-                if (response.data.code === 200) {
-                    this.$message.success('已提交待确认')
-                    this.completeVisible = false
-                    this.load()
-                } else this.$message.error(response.data.message || '提交失败')
-            } finally {
-                this.acting = false
-            }
-        },
-        confirm(row) {
-            this.$confirm('确认该报修已完成吗？', '提示', { type: 'warning' })
-                .then(() => this.postAction(`repair/confirm/${row.id}`, '确认成功'))
-                .catch(() => {})
-        },
-        remove(row) {
-            this.$confirm('确认删除该报修单吗？', '提示', { type: 'warning' })
-                .then(() => this.postAction(`repair/delete/${row.id}`, '删除成功'))
-                .catch(() => {})
-        },
-        postAction(url, text) {
-            return this.$axios.post(url, { userId: localStorage.getItem('userId') }).then(response => {
-                if (response.data.code === 200) {
-                    this.$message.success(text)
-                    this.load()
-                } else this.$message.error(response.data.message || '操作失败')
-            })
         }
     }
 }

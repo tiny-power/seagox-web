@@ -1,11 +1,18 @@
 <template>
     <div class="document-page">
             <el-form :inline="true" :model="query" class="filter-form" @submit.native.prevent>
-                <el-form-item label="项目编号">
-                    <el-input v-model.trim="query.code" clearable placeholder="请输入项目编号" />
-                </el-form-item>
                 <el-form-item label="项目名称">
-                    <el-input v-model.trim="query.name" clearable placeholder="请输入项目名称" />
+                    <el-select
+                        v-model="query.projectId"
+                        clearable
+                        filterable
+                        remote
+                        :remote-method="loadProjects"
+                        :loading="projectLoading"
+                        placeholder="请选择项目"
+                    >
+                        <el-option v-for="item in projectOptions" :key="item.id" :label="item.name" :value="item.id" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
@@ -15,11 +22,7 @@
         <div class="table-wrapper">
         <el-table class="project-data-table rounded-table" v-loading="loading" :data="rows" height="100%" border stripe
             ><el-table-column type="index" width="55" label="序号" align="center" /><el-table-column
-                prop="code"
-                label="项目编号"
-                align="center"
-                min-width="120"
-            /><el-table-column prop="name" label="项目名称" min-width="180" align="center" /><el-table-column
+                prop="name" label="项目名称" min-width="180" align="center" /><el-table-column
                 prop="address"
                 label="项目地址"
                 align="center"
@@ -66,15 +69,21 @@ export default {
     data() {
         return {
             loading: false,
+            projectLoading: false,
+            projectOptions: [],
             rows: [],
             total: 0,
-            query: { pageNo: 1, pageSize: 10, code: '', name: '' }
+            query: this.createQuery()
         }
     },
     created() {
+        this.loadProjects()
         this.load()
     },
     methods: {
+        createQuery() {
+            return { pageNo: 1, pageSize: 10, projectId: '' }
+        },
         toNumber(value) {
             let amount = Number(value)
             return Number.isFinite(amount) ? amount : 0
@@ -120,6 +129,22 @@ export default {
             if (level === 'warning') return '黄色预警'
             return '正常'
         },
+        async loadProjects(name) {
+            this.projectLoading = true
+            try {
+                let response = await this.$axios.get('project/queryByPage', {
+                    params: { pageNo: 1, pageSize: 50, name: name || '' }
+                })
+                if (response.data.code === 200) {
+                    let data = response.data.data || {}
+                    this.projectOptions = data.list || []
+                } else {
+                    this.$message.error(response.data.message || '项目查询失败')
+                }
+            } finally {
+                this.projectLoading = false
+            }
+        },
         async load() {
             this.loading = true
             try {
@@ -137,8 +162,7 @@ export default {
             this.load()
         },
         resetSearch() {
-            this.query.code = ''
-            this.query.name = ''
+            this.query = this.createQuery()
             this.search()
         },
         pageChange(pageNo) {

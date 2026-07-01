@@ -22,11 +22,18 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
                 <el-button icon="el-icon-refresh" @click="reset">重置</el-button>
-                <el-button type="primary" icon="el-icon-plus" @click="openForm()">新增</el-button>
             </el-form-item>
         </el-form>
         <div class="table-wrapper">
-            <el-table class="rounded-table" v-loading="loading" :data="rows" height="100%" border stripe>
+            <el-table
+                class="rounded-table"
+                v-loading="loading"
+                :data="rows"
+                height="100%"
+                border
+                stripe
+                @row-dblclick="openDetail"
+            >
                 <el-table-column type="index" label="序号" width="55" align="center" />
                 <el-table-column prop="projectName" label="项目名称" min-width="180" align="center" show-overflow-tooltip />
                 <el-table-column label="版本" width="100" align="center">
@@ -44,15 +51,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="updatedAt" label="更新时间" width="170" align="center" />
-                <el-table-column label="操作" width="380" align="center" fixed="right">
+                <el-table-column label="操作" width="120" align="center" fixed="right">
                     <template slot-scope="scope">
                         <el-button type="text" size="small" @click="openDetail(scope.row)">版本记录</el-button>
-                        <el-button type="text" size="small" @click="openForm(scope.row)" v-if="scope.row.status !== 3">编辑</el-button>
-                        <el-button type="text" size="small" @click="submit(scope.row)" v-if="scope.row.status !== 3">提交</el-button>
-                        <el-button type="text" size="small" @click="confirmRead(scope.row, 'owner')" v-if="scope.row.status === 2">业主确认</el-button>
-                        <el-button type="text" size="small" @click="confirmRead(scope.row, 'builder')" v-if="scope.row.status === 2">施工确认</el-button>
-                        <el-button type="text" size="small" @click="cancelArchive(scope.row)" v-if="scope.row.status === 3">取消归档</el-button>
-                        <el-button type="text" size="small" @click="remove(scope.row)" v-if="scope.row.status !== 3">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -67,78 +68,6 @@
             @current-change="pageChange"
             @size-change="sizeChange"
         />
-
-        <el-dialog :title="form.id ? '编辑施工图出图' : '新增施工图出图'" :visible.sync="formVisible" width="820px">
-            <el-form ref="form" :model="form" :rules="rules" label-width="150px">
-                <el-form-item label="所属项目" prop="projectId">
-                    <el-select
-                        v-model="form.projectId"
-                        clearable
-                        filterable
-                        remote
-                        :remote-method="loadProjects"
-                        class="form-control"
-                        placeholder="请选择项目"
-                    >
-                        <el-option v-for="item in projectOptions" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="版本" prop="version">
-                    <el-input v-model.trim="form.version" maxlength="50" placeholder="请输入版本，如 V1.0" />
-                </el-form-item>
-                <el-form-item label="施工确认人员" prop="confirmMembers.builder.memberId">
-                    <el-select
-                        v-model="form.confirmMembers.builder.memberId"
-                        class="form-control"
-                        clearable
-                        filterable
-                        remote
-                        :remote-method="loadUsers"
-                        placeholder="请选择施工确认人员"
-                        @change="value => selectConfirmMember('builder', value)"
-                    >
-                        <el-option v-for="item in userOptions" :key="item.id" :label="userLabel(item)" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="业主确认人员" prop="confirmMembers.owner.memberId">
-                    <el-select
-                        v-model="form.confirmMembers.owner.memberId"
-                        class="form-control"
-                        clearable
-                        filterable
-                        remote
-                        :remote-method="loadUsers"
-                        placeholder="请选择业主确认人员"
-                        @change="value => selectConfirmMember('owner', value)"
-                    >
-                        <el-option v-for="item in userOptions" :key="item.id" :label="userLabel(item)" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item
-                    v-for="category in categories"
-                    :key="category.key"
-                    :label="category.label"
-                    :prop="category.key"
-                >
-                    <el-upload
-                        action=""
-                        multiple
-                        :file-list="fileLists[category.key]"
-                        :http-request="option => uploadFile(option, category.key)"
-                        :on-remove="file => removeFile(file, category.key)"
-                    >
-                        <el-button size="small" type="primary" icon="el-icon-upload2">上传附件</el-button>
-                    </el-upload>
-                </el-form-item>
-                <el-form-item label="修改说明">
-                    <el-input v-model="form.solutionExplanation" type="textarea" :rows="4" maxlength="1000" show-word-limit />
-                </el-form-item>
-            </el-form>
-            <span slot="footer">
-                <el-button @click="formVisible = false">取消</el-button>
-                <el-button type="primary" :loading="saving" @click="save">保存</el-button>
-            </span>
-        </el-dialog>
 
         <el-dialog title="版本记录" :visible.sync="detailVisible" width="900px">
             <div v-loading="detailLoading" class="version-dialog">
@@ -181,17 +110,11 @@ export default {
     data() {
         return {
             loading: false,
-            saving: false,
-            acting: false,
             projectLoading: false,
-            userOptions: [],
             rows: [],
             total: 0,
             projectOptions: [],
             query: this.createQuery(),
-            formVisible: false,
-            form: this.createForm(),
-            fileLists: this.createFileLists(),
             detailVisible: false,
             detailLoading: false,
             detailVersions: [],
@@ -205,53 +128,21 @@ export default {
                 { value: 1, label: '待提交' },
                 { value: 2, label: '待确认' },
                 { value: 3, label: '已归档' }
-            ],
-            rules: {
-                projectId: [{ required: true, message: '请选择项目', trigger: 'change' }],
-                version: [{ required: true, message: '请输入版本', trigger: 'blur' }],
-                'confirmMembers.builder.memberId': [{ required: true, message: '请选择施工确认人员', trigger: 'change' }],
-                'confirmMembers.owner.memberId': [{ required: true, message: '请选择业主确认人员', trigger: 'change' }],
-                architectureAttachments: [{ required: true, message: '请上传建筑设计附件', trigger: 'change' }],
-                structureAttachments: [{ required: true, message: '请上传结构设计附件', trigger: 'change' }],
-                decorationAttachments: [{ required: true, message: '请上传精装图纸附件', trigger: 'change' }],
-                procurementAttachments: [{ required: true, message: '请上传主材及软装采购方案附件', trigger: 'change' }]
-            }
+            ]
         }
     },
     created() {
         this.loadProjects()
-        this.loadUsers()
         this.load()
     },
     methods: {
         createQuery() {
             return { pageNo: 1, pageSize: 10, projectId: '', status: '' }
         },
-        createForm() {
-            return {
-                id: '',
-                projectId: '',
-                version: 'V1.0',
-                architectureAttachments: [],
-                structureAttachments: [],
-                decorationAttachments: [],
-                procurementAttachments: [],
-                confirmMembers: this.createConfirmMembers(),
-                solutionExplanation: ''
-            }
-        },
         createConfirmMembers() {
             return {
                 owner: { confirmed: false, confirmedAt: '' },
                 builder: { confirmed: false, confirmedAt: '' }
-            }
-        },
-        createFileLists() {
-            return {
-                architectureAttachments: [],
-                structureAttachments: [],
-                decorationAttachments: [],
-                procurementAttachments: []
             }
         },
         statusType(status) {
@@ -290,85 +181,12 @@ export default {
             const builder = data.builder && data.builder.confirmed ? `施工${builderName}已确认` : `施工${builderName}待确认`
             return `${owner} / ${builder}`
         },
-        userName(user) {
-            return user.userName || user.name || ''
-        },
-        userRole(user) {
-            return user.position || user.roleName || user.role || ''
-        },
-        userPhone(user) {
-            return user.phone || user.mobile || ''
-        },
-        userLabel(user) {
-            const role = this.userRole(user)
-            return role ? `${this.userName(user)}（${role}）` : this.userName(user)
-        },
-        normalizeUser(user) {
-            return {
-                id: user.id || user.userId,
-                userId: user.userId || user.id,
-                name: this.userName(user),
-                role: this.userRole(user),
-                avatar: user.avatar || '',
-                phone: this.userPhone(user)
-            }
-        },
-        mergeConfirmUserOptions(confirmMembers) {
-            const additions = ['builder', 'owner']
-                .map(roleKey => confirmMembers[roleKey])
-                .filter(item => item && item.memberId && item.name && !this.userOptions.some(user => String(user.id) === String(item.memberId)))
-                .map(item => ({ id: item.memberId, userId: item.userId, name: item.name, role: item.role, avatar: item.avatar, phone: item.phone }))
-            if (additions.length) this.userOptions = this.userOptions.concat(additions)
-        },
-        selectConfirmMember(roleKey, value) {
-            const user = this.userOptions.find(item => String(item.id) === String(value))
-            if (!user) {
-                this.$set(this.form.confirmMembers, roleKey, { confirmed: false, confirmedAt: '' })
-                return
-            }
-            const member = this.normalizeUser(user)
-            this.$set(this.form.confirmMembers, roleKey, Object.assign({}, this.form.confirmMembers[roleKey], {
-                memberId: member.id,
-                userId: member.userId,
-                name: member.name,
-                role: member.role,
-                avatar: member.avatar,
-                phone: member.phone,
-                confirmed: false,
-                confirmedAt: ''
-            }))
-        },
         formatSize(size) {
             const value = Number(size)
             if (!value) return '-'
             if (value < 1024) return `${value}B`
             if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)}KB`
             return `${(value / 1024 / 1024).toFixed(1)}MB`
-        },
-        syncFileLists() {
-            const fileLists = this.createFileLists()
-            this.categories.forEach(category => {
-                fileLists[category.key] = this.form[category.key].map(file => ({
-                    name: file.name || '附件',
-                    url: file.url,
-                    response: file
-                }))
-            })
-            this.fileLists = fileLists
-        },
-        buildPayload() {
-            return {
-                id: this.form.id,
-                projectId: this.form.projectId,
-                version: String(this.form.version || '').replace(/^[vV]/, '').split('.')[0] || 1,
-                architectureAttachments: JSON.stringify(this.form.architectureAttachments),
-                structureAttachments: JSON.stringify(this.form.structureAttachments),
-                decorationAttachments: JSON.stringify(this.form.decorationAttachments),
-                procurementAttachments: JSON.stringify(this.form.procurementAttachments),
-                solutionExplanation: this.form.solutionExplanation,
-                confirmMembers: JSON.stringify(this.form.confirmMembers),
-                userId: localStorage.getItem('userId')
-            }
         },
         async loadProjects(name) {
             this.projectLoading = true
@@ -381,12 +199,6 @@ export default {
             } finally {
                 this.projectLoading = false
             }
-        },
-        async loadUsers(name) {
-            const response = await this.$axios.get('user/queryByPage', {
-                params: { pageNo: 1, pageSize: 50, companyId: localStorage.getItem('companyId'), name: name || '' }
-            })
-            if (response.data.code === 200) this.userOptions = (response.data.data || {}).list || []
         },
         async load() {
             this.loading = true
@@ -431,92 +243,6 @@ export default {
             } finally {
                 this.detailLoading = false
             }
-        },
-        openForm(row) {
-            this.form = row
-                ? {
-                      id: row.id,
-                      projectId: row.projectId,
-                      version: this.versionLabel(row.version),
-                      architectureAttachments: this.parseAttachments(row.architectureAttachments),
-                      structureAttachments: this.parseAttachments(row.structureAttachments),
-                      decorationAttachments: this.parseAttachments(row.decorationAttachments),
-                      procurementAttachments: this.parseAttachments(row.procurementAttachments),
-                      confirmMembers: this.parseConfirmMembers(row.confirmMembers),
-                      solutionExplanation: row.solutionExplanation || ''
-                  }
-                : this.createForm()
-            this.mergeConfirmUserOptions(this.form.confirmMembers)
-            this.syncFileLists()
-            this.formVisible = true
-            this.$nextTick(() => this.$refs.form && this.$refs.form.clearValidate())
-        },
-        async uploadFile(option, key) {
-            const formData = new FormData()
-            formData.append('file', option.file)
-            const response = await this.$axios.post('upload/putObject/oss', formData)
-            if (response.data.code !== 200) {
-                this.$message.error(response.data.message || '上传失败')
-                return
-            }
-            this.form[key].push({
-                name: option.file.name,
-                type: option.file.type || 'application/octet-stream',
-                url: response.data.data,
-                size: option.file.size
-            })
-            this.syncFileLists()
-            this.$refs.form && this.$refs.form.validateField(key)
-        },
-        removeFile(file, key) {
-            this.form[key] = this.form[key].filter(item => item.url !== file.url)
-            this.syncFileLists()
-        },
-        save() {
-            this.$refs.form.validate(async valid => {
-                if (!valid) return
-                this.saving = true
-                try {
-                    const response = await this.$axios.post('constructionDrawing/save', this.buildPayload())
-                    if (response.data.code === 200) {
-                        this.$message.success('保存成功')
-                        this.formVisible = false
-                        this.load()
-                    } else this.$message.error(response.data.message || '保存失败')
-                } finally {
-                    this.saving = false
-                }
-            })
-        },
-        postAction(url, successText, data = {}) {
-            this.acting = true
-            return this.$axios
-                .post(url, Object.assign({ userId: localStorage.getItem('userId') }, data))
-                .then(response => {
-                    if (response.data.code === 200) {
-                        this.$message.success(successText)
-                        this.load()
-                    } else this.$message.error(response.data.message || '操作失败')
-                })
-                .finally(() => {
-                    this.acting = false
-                })
-        },
-        submit(row) {
-            this.postAction(`constructionDrawing/submit/${row.id}`, '提交成功')
-        },
-        confirmRead(row, roleKey) {
-            this.postAction(`constructionDrawing/confirmRead/${row.id}`, '确认成功', { roleKey })
-        },
-        cancelArchive(row) {
-            this.$confirm('确认取消该施工图归档吗？', '提示', { type: 'warning' })
-                .then(() => this.postAction(`constructionDrawing/cancelArchive/${row.id}`, '已取消归档'))
-                .catch(() => {})
-        },
-        remove(row) {
-            this.$confirm('确认删除该施工图出图吗？', '提示', { type: 'warning' })
-                .then(() => this.postAction(`constructionDrawing/delete/${row.id}`, '删除成功'))
-                .catch(() => {})
         }
     }
 }

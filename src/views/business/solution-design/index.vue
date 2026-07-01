@@ -27,11 +27,18 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search">查询</el-button>
                 <el-button icon="el-icon-refresh" @click="reset">重置</el-button>
-                <el-button type="primary" icon="el-icon-plus" @click="openForm()">新增</el-button>
             </el-form-item>
         </el-form>
         <div class="table-wrapper">
-            <el-table class="rounded-table" v-loading="loading" :data="rows" height="100%" border stripe>
+            <el-table
+                class="rounded-table"
+                v-loading="loading"
+                :data="rows"
+                height="100%"
+                border
+                stripe
+                @row-dblclick="openDetail"
+            >
                 <el-table-column type="index" label="序号" width="55" align="center" />
                 <el-table-column
                     prop="projectName"
@@ -58,19 +65,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="updatedAt" label="更新时间" width="170" align="center" />
-                <el-table-column label="操作" width="440" align="center" fixed="right">
+                <el-table-column label="操作" width="300" align="center" fixed="right">
                     <template slot-scope="scope">
                         <el-button type="text" size="small" @click="openDetail(scope.row)">版本记录</el-button>
-                        <el-button type="text" size="small" @click="openForm(scope.row)">编辑</el-button>
-                        <el-button type="text" size="small" @click="submit(scope.row)" v-if="scope.row.status === 1"
-                            >提交</el-button
-                        >
-                        <el-button type="text" size="small" @click="confirm(scope.row)" v-if="scope.row.status === 2"
-                            >确认</el-button
-                        >
-                        <el-button type="text" size="small" @click="openFreeze(scope.row)" v-if="scope.row.status === 3"
-                            >冻结</el-button
-                        >
                         <el-button
                             type="text"
                             size="small"
@@ -96,9 +93,6 @@
                             >拒绝解冻</el-button
                         >
                         <el-button type="text" size="small" @click="openMessage(scope.row)">留言</el-button>
-                        <el-button type="text" size="small" @click="remove(scope.row)" v-if="scope.row.status !== 6"
-                            >删除</el-button
-                        >
                     </template>
                 </el-table-column>
             </el-table>
@@ -113,54 +107,6 @@
             @current-change="pageChange"
             @size-change="sizeChange"
         />
-
-        <el-dialog :title="form.id ? '编辑方案设计' : '新增方案设计'" :visible.sync="formVisible" width="720px">
-            <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-                <el-form-item label="所属项目" prop="projectId">
-                    <el-select
-                        v-model="form.projectId"
-                        clearable
-                        filterable
-                        remote
-                        :remote-method="loadProjects"
-                        class="form-control"
-                        placeholder="请选择项目"
-                    >
-                        <el-option v-for="item in projectOptions" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="版本" prop="version">
-                    <el-input v-model.trim="form.version" maxlength="255" placeholder="请输入版本，如 V1.0" />
-                </el-form-item>
-                <el-form-item label="效果图" prop="attachments">
-                    <el-upload
-                        action=""
-                        list-type="picture-card"
-                        :file-list="fileList"
-                        :http-request="uploadImage"
-                        :on-remove="removeImage"
-                    >
-                        <i class="el-icon-plus"></i>
-                    </el-upload>
-                </el-form-item>
-                <el-form-item label="方案说明" prop="solutionExplanation">
-                    <el-input
-                        v-model="form.solutionExplanation"
-                        type="textarea"
-                        :rows="4"
-                        maxlength="1000"
-                        show-word-limit
-                    />
-                </el-form-item>
-                <el-form-item label="修改注释">
-                    <el-input v-model="form.annotation" type="textarea" :rows="3" maxlength="1000" show-word-limit />
-                </el-form-item>
-            </el-form>
-            <span slot="footer">
-                <el-button @click="formVisible = false">取消</el-button>
-                <el-button type="primary" :loading="saving" @click="save">保存</el-button>
-            </span>
-        </el-dialog>
 
         <el-dialog title="版本记录" :visible.sync="detailVisible" width="860px">
             <div v-loading="detailLoading" class="version-dialog">
@@ -211,18 +157,6 @@
             </div>
         </el-dialog>
 
-        <el-dialog title="冻结方案" :visible.sync="freezeVisible" width="520px">
-            <el-form label-width="100px">
-                <el-form-item label="签字文件">
-                    <el-input v-model="signatureUrl" maxlength="500" placeholder="请输入签字文件地址" />
-                </el-form-item>
-            </el-form>
-            <span slot="footer">
-                <el-button @click="freezeVisible = false">取消</el-button>
-                <el-button type="primary" :loading="acting" @click="freeze">确认</el-button>
-            </span>
-        </el-dialog>
-
         <el-dialog title="申请解冻" :visible.sync="defrostVisible" width="520px">
             <el-form label-width="100px">
                 <el-form-item label="解冻说明">
@@ -245,18 +179,6 @@
                 </div>
                 <el-empty v-if="!messages.length" description="暂无留言"></el-empty>
             </div>
-            <el-input
-                v-model="messageText"
-                type="textarea"
-                :rows="3"
-                maxlength="500"
-                show-word-limit
-                placeholder="请输入留言"
-            />
-            <span slot="footer">
-                <el-button @click="messageVisible = false">关闭</el-button>
-                <el-button type="primary" :loading="acting" @click="addMessage">提交留言</el-button>
-            </span>
         </el-dialog>
     </div>
 </template>
@@ -266,27 +188,20 @@ export default {
     data() {
         return {
             loading: false,
-            saving: false,
             acting: false,
             projectLoading: false,
             rows: [],
             total: 0,
             projectOptions: [],
             query: this.createQuery(),
-            formVisible: false,
-            form: this.createForm(),
-            fileList: [],
             detailVisible: false,
             detailLoading: false,
             detailVersions: [],
             activeRow: null,
-            freezeVisible: false,
-            signatureUrl: '',
             defrostVisible: false,
             defrostExplanation: '',
             messageVisible: false,
             messages: [],
-            messageText: '',
             statusOptions: [
                 { value: 1, label: '待提交' },
                 { value: 2, label: '待确认' },
@@ -294,13 +209,7 @@ export default {
                 { value: 4, label: '已冻结' },
                 { value: 5, label: '解冻中' },
                 { value: 6, label: '已完成' }
-            ],
-            rules: {
-                projectId: [{ required: true, message: '请选择项目', trigger: 'change' }],
-                version: [{ required: true, message: '请输入版本', trigger: 'blur' }],
-                attachments: [{ required: true, message: '请上传效果图', trigger: 'change' }],
-                solutionExplanation: [{ required: true, message: '请输入方案说明', trigger: 'blur' }]
-            }
+            ]
         }
     },
     created() {
@@ -310,9 +219,6 @@ export default {
     methods: {
         createQuery() {
             return { pageNo: 1, pageSize: 10, projectId: '', status: '' }
-        },
-        createForm() {
-            return { id: '', projectId: '', version: 'V1.0', attachments: [], solutionExplanation: '', annotation: '' }
         },
         statusType(status) {
             return { 2: 'warning', 3: 'primary', 4: 'success', 5: 'warning', 6: 'success' }[Number(status)] || 'info'
@@ -346,21 +252,6 @@ export default {
             if (value < 1024) return `${value}B`
             if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)}KB`
             return `${(value / 1024 / 1024).toFixed(1)}MB`
-        },
-        syncFileList() {
-            this.fileList = this.form.attachments.map((item, index) => ({
-                name: item.name || `效果图-${index + 1}`,
-                url: item.url,
-                response: item
-            }))
-        },
-        buildPayload() {
-            return {
-                ...this.form,
-                version: String(this.form.version || '').replace(/^[vV]/, '').split('.')[0] || 1,
-                attachments: JSON.stringify(this.form.attachments),
-                userId: localStorage.getItem('userId')
-            }
         },
         async loadProjects(name) {
             this.projectLoading = true
@@ -418,63 +309,6 @@ export default {
                 this.detailLoading = false
             }
         },
-        openForm(row) {
-            this.form = row
-                ? {
-                      id: row.id,
-                      projectId: row.projectId,
-                      version: this.nextEditableVersion(row),
-                      attachments: this.parseAttachments(row.attachments),
-                      solutionExplanation: row.solutionExplanation,
-                      annotation: row.annotation || ''
-                  }
-                : this.createForm()
-            this.syncFileList()
-            this.formVisible = true
-            this.$nextTick(() => this.$refs.form && this.$refs.form.clearValidate())
-        },
-        nextEditableVersion(row) {
-            const version = Number(row.version) || 1
-            return row.status === 1 && row.defrostExplanation ? version + 1 : version
-        },
-        async uploadImage(option) {
-            const formData = new FormData()
-            formData.append('file', option.file)
-            const response = await this.$axios.post('upload/putObject/oss', formData)
-            if (response.data.code !== 200) {
-                this.$message.error(response.data.message || '上传失败')
-                return
-            }
-            const item = {
-                name: option.file.name,
-                type: option.file.type,
-                url: response.data.data,
-                size: option.file.size
-            }
-            this.form.attachments.push(item)
-            this.syncFileList()
-            this.$refs.form && this.$refs.form.validateField('attachments')
-        },
-        removeImage(file) {
-            this.form.attachments = this.form.attachments.filter(item => item.url !== file.url)
-            this.syncFileList()
-        },
-        save() {
-            this.$refs.form.validate(async valid => {
-                if (!valid) return
-                this.saving = true
-                try {
-                    const response = await this.$axios.post('solutionDesign/save', this.buildPayload())
-                    if (response.data.code === 200) {
-                        this.$message.success('保存成功')
-                        this.formVisible = false
-                        this.load()
-                    } else this.$message.error(response.data.message || '保存失败')
-                } finally {
-                    this.saving = false
-                }
-            })
-        },
         postAction(url, successText) {
             this.acting = true
             return this.$axios
@@ -488,34 +322,6 @@ export default {
                 .finally(() => {
                     this.acting = false
                 })
-        },
-        submit(row) {
-            this.postAction(`solutionDesign/submit/${row.id}`, '提交成功')
-        },
-        confirm(row) {
-            this.postAction(`solutionDesign/confirm/${row.id}`, '确认成功')
-        },
-        openFreeze(row) {
-            this.activeRow = row
-            this.signatureUrl = row.signatureUrl || ''
-            this.freezeVisible = true
-        },
-        async freeze() {
-            if (!this.signatureUrl) return this.$message.warning('请输入签字文件地址')
-            this.acting = true
-            try {
-                const response = await this.$axios.post(`solutionDesign/freeze/${this.activeRow.id}`, {
-                    signatureUrl: this.signatureUrl,
-                    userId: localStorage.getItem('userId')
-                })
-                if (response.data.code === 200) {
-                    this.$message.success('冻结成功')
-                    this.freezeVisible = false
-                    this.load()
-                } else this.$message.error(response.data.message || '冻结失败')
-            } finally {
-                this.acting = false
-            }
         },
         openDefrost(row) {
             this.activeRow = row
@@ -548,38 +354,13 @@ export default {
         complete(row) {
             this.postAction(`solutionDesign/complete/${row.id}`, '方案已完成')
         },
-        remove(row) {
-            this.$confirm('确认删除该方案设计吗？', '提示', { type: 'warning' })
-                .then(() => this.postAction(`solutionDesign/delete/${row.id}`, '删除成功'))
-                .catch(() => {})
-        },
         async openMessage(row) {
             this.activeRow = row
-            this.messageText = ''
             this.messageVisible = true
             const response = await this.$axios.get('leaveMessage/queryByPage', {
                 params: { pageNo: 1, pageSize: 100, projectId: row.projectId, type: 1 }
             })
             this.messages = response.data.code === 200 ? (response.data.data || {}).list || [] : []
-        },
-        async addMessage() {
-            if (!this.messageText) return this.$message.warning('请输入留言')
-            this.acting = true
-            try {
-                const response = await this.$axios.post('leaveMessage/insert', {
-                    projectId: this.activeRow.projectId,
-                    projectMemberId: localStorage.getItem('projectMemberId') || 0,
-                    type: 1,
-                    remark: this.messageText,
-                    userId: localStorage.getItem('userId')
-                })
-                if (response.data.code === 200) {
-                    this.$message.success('留言成功')
-                    this.openMessage(this.activeRow)
-                } else this.$message.error(response.data.message || '留言失败')
-            } finally {
-                this.acting = false
-            }
         }
     }
 }
