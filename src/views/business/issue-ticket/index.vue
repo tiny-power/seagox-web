@@ -27,13 +27,6 @@
                         @keyup.enter.native="search"
                     />
                 </el-form-item>
-                <el-form-item label="问题来源">
-                    <el-select v-model="query.sourceType" clearable placeholder="请选择问题来源">
-                        <el-option label="施工日志" :value="1" />
-                        <el-option label="验收单" :value="2" />
-                        <el-option label="交接单" :value="3" />
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="query.status" clearable placeholder="请选择状态">
                         <el-option label="待整改" :value="1" />
@@ -78,16 +71,6 @@
                     show-overflow-tooltip
                 >
                     <template slot-scope="scope">{{ formatValue(scope.row.projectName) }}</template>
-                </el-table-column>
-                <el-table-column
-                    prop="sourceType"
-                    label="问题来源"
-                    width="110"
-                    align="center"
-                    header-align="center"
-                    show-overflow-tooltip
-                >
-                    <template slot-scope="scope">{{ formatSourceType(scope.row.sourceType) }}</template>
                 </el-table-column>
                 <el-table-column
                     prop="reportedByName"
@@ -158,7 +141,6 @@ export default {
                 pageSize: 10,
                 projectId: '',
                 keyword: '',
-                sourceType: '',
                 status: ''
             }
         }
@@ -174,7 +156,6 @@ export default {
                 pageSize: 10,
                 projectId: '',
                 keyword: '',
-                sourceType: '',
                 status: ''
             }
         },
@@ -188,19 +169,6 @@ export default {
         formatMoney(value) {
             if (value === null || value === undefined || value === '') return '-'
             return '¥' + Number(value).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        },
-        formatSourceType(value) {
-            if (value === null || value === undefined || value === '') return '-'
-            switch (String(value)) {
-                case '1':
-                    return '施工日志'
-                case '2':
-                    return '验收单'
-                case '3':
-                    return '交接单'
-                default:
-                    return value
-            }
         },
         formatIssueStatus(value) {
             if (value === null || value === undefined || value === '') return '-'

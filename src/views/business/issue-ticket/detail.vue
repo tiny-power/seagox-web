@@ -3,8 +3,6 @@
             <el-descriptions v-if="record.id" class="detail-descriptions" :column="2" border>
                 <el-descriptions-item label="问题标题">{{ formatValue(record.title) }}</el-descriptions-item>
                 <el-descriptions-item label="项目名称">{{ formatValue(record.projectName) }}</el-descriptions-item>
-                <el-descriptions-item label="问题来源">{{ formatSourceType(record.sourceType) }}</el-descriptions-item>
-                <el-descriptions-item label="来源单据ID">{{ formatValue(record.sourceId) }}</el-descriptions-item>
                 <el-descriptions-item label="问题描述" :span="2">{{
                     formatValue(record.description)
                 }}</el-descriptions-item>
@@ -131,19 +129,6 @@ export default {
         formatMoney(value) {
             if (value === null || value === undefined || value === '') return '-'
             return '¥' + Number(value).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        },
-        formatSourceType(value) {
-            if (value === null || value === undefined || value === '') return '-'
-            switch (String(value)) {
-                case '1':
-                    return '施工日志'
-                case '2':
-                    return '验收单'
-                case '3':
-                    return '交接单'
-                default:
-                    return value
-            }
         },
         formatReviewResult(value) {
             if (value === null || value === undefined || value === '') return '-'
