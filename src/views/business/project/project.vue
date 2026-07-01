@@ -58,7 +58,9 @@
                     ><el-button type="text" @click="$router.push({ path: '/projectEdit', query: { id: s.row.id } })"
                         >编辑</el-button
                     ><el-button v-if="Number(s.row.status) === 1" type="text" @click="start(s.row)">启动</el-button
-                    ><el-button type="text" class="danger" @click="remove(s.row)">删除</el-button></template
+                    ><el-button v-if="Number(s.row.status) === 1" type="text" class="danger" @click="remove(s.row)"
+                        >删除</el-button
+                    ></template
                 ></el-table-column
             ></el-table
         >
@@ -143,6 +145,9 @@ export default {
             })
         },
         remove(row) {
+            if (Number(row.status) !== 1) {
+                return this.$message.warning('项目启动后不能删除')
+            }
             this.$confirm('确认删除项目“' + row.name + '”吗？', '提示', { type: 'warning' }).then(async () => {
                 let r = await this.$axios.post('project/delete/' + row.id)
                 if (r.data.code === 200) {

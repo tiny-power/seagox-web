@@ -413,6 +413,9 @@ export default {
             this.inspectionItemsDraft.push({ name: '', status: 0 })
         },
         confirmInspectionItems() {
+            if (!this.inspectionItemsDraft.length) {
+                return this.$message.warning('请至少添加一条验收项目')
+            }
             if (this.inspectionItemsDraft.some(item => !item.name || !item.name.trim())) {
                 return this.$message.warning('请填写验收条目名称')
             }
@@ -542,6 +545,43 @@ export default {
             this.userDialogVisible = false
             this.$message.success(`已添加${addedCount}位成员`)
         },
+        validateStages() {
+            if (!this.stages.length) {
+                this.activeTab = 'stages'
+                this.$message.warning('请至少添加一个项目阶段')
+                return false
+            }
+            if (this.stages.some(x => !x.stageName)) {
+                this.activeTab = 'stages'
+                this.$message.warning('请输入项目阶段名称')
+                return false
+            }
+            if (this.stages.some(x => !x.flowType)) {
+                this.activeTab = 'stages'
+                this.$message.warning('请选择项目阶段流程类型')
+                return false
+            }
+            if (!this.stages.some(x => x.flowType === 5) || !this.stages.some(x => x.flowType === 6)) {
+                this.activeTab = 'stages'
+                this.$message.warning('项目阶段流程类型至少包含交付和售后')
+                return false
+            }
+            if (this.stages.some(x => !x.plannedStartDate || !x.plannedEndDate)) {
+                this.activeTab = 'stages'
+                this.$message.warning('请填写项目阶段计划开始日期和计划完成日期')
+                return false
+            }
+            if (
+                this.stages.some(
+                    x => !x.inspectionItems || !x.inspectionItems.length || x.inspectionItems.some(i => !i.name || !i.name.trim())
+                )
+            ) {
+                this.activeTab = 'stages'
+                this.$message.warning('每个项目阶段至少添加一条验收项目并填写名称')
+                return false
+            }
+            return true
+        },
         async loadDetail() {
             this.loading = true
             let r = await this.$axios.get('project/queryById/' + this.$route.query.id)
@@ -570,18 +610,7 @@ export default {
                     return this.$message.warning('请至少添加一个项目角色')
                 }
                 if (this.members.some(x => !x.userId || !x.roleCode)) return this.$message.warning('请完善项目角色信息')
-                if (!this.stages.length) {
-                    this.activeTab = 'stages'
-                    return this.$message.warning('请至少添加一个项目阶段')
-                }
-                if (this.stages.some(x => !x.stageName)) return this.$message.warning('请输入项目阶段名称')
-                if (this.stages.some(x => !x.flowType)) return this.$message.warning('请选择项目阶段流程类型')
-                if (this.stages.some(x => !x.plannedStartDate || !x.plannedEndDate)) {
-                    this.activeTab = 'stages'
-                    return this.$message.warning('请填写项目阶段计划开始日期和计划完成日期')
-                }
-                if (this.stages.some(x => x.inspectionItems.some(i => !i.name)))
-                    return this.$message.warning('请填写阶段验收条目')
+                if (!this.validateStages()) return
                 this.saving = true
                 let payload = { project: this.form, members: this.members, stages: this.stages }
                 let url = 'project/update'

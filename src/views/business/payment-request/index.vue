@@ -29,7 +29,6 @@
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="query.status" clearable placeholder="请选择状态">
-                        <el-option label="草稿" :value="0" />
                         <el-option label="审批中" :value="1" />
                         <el-option label="已撤销" :value="2" />
                         <el-option label="已通过" :value="3" />
@@ -123,6 +122,13 @@
                 >
                     <template slot-scope="scope">{{ formatValue(scope.row.createdAt) }}</template>
                 </el-table-column>
+                <el-table-column label="操作" width="100" align="center" header-align="center">
+                    <template slot-scope="scope">
+                        <el-button type="text" size="small" @click.stop="handleProcess(scope.row)" v-if="scope.row.status !== 0"
+                            >流程查看</el-button
+                        >
+                    </template>
+                </el-table-column>
             </el-table>
             </div>
             <el-pagination
@@ -199,7 +205,7 @@ export default {
             }
         },
         buildParams() {
-            return { ...this.query }
+            return { ...this.query, excludeDraft: 1 }
         },
         async loadProjects(name) {
             this.projectLoading = true
@@ -247,6 +253,16 @@ export default {
         },
         view(row) {
             this.$router.push({ path: '/paymentRequestDetail', query: { id: row.id } })
+        },
+        handleProcess(row) {
+            this.$router.push({
+                path: '/flowDisplay',
+                query: {
+                    businessKey: row.id,
+                    businessType: 'payment_request',
+                    title: '请款单-' + row.id
+                }
+            })
         }
     }
 }
