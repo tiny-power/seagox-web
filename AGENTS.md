@@ -9,6 +9,7 @@
 - 系统页面优先放在 `src/views/system/`。
 - 路由配置在 `src/router/index.js`。
 - 接口请求使用现有 `this.$axios`。
+- 后端接口默认会从 token 解析并注入 `companyId` 和 `userId` 参数；接口请求不要手动传当前组织 ID和用户 ID。
 - 页面样式优先复用已有全局类，例如 `searchView`、`toolView`、`pagination`。
 - 表格、弹窗、表单优先沿用 Element UI 组件和现有页面交互模式。
 - 不要手动修改 `dist/` 或 `node_modules/`。
