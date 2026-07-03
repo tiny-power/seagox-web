@@ -21,16 +21,14 @@
                     </div>
                     <span v-else>-</span>
                 </el-descriptions-item>
-                <el-descriptions-item label="发现人">{{ formatValue(record.reportedByName) }}</el-descriptions-item>
-                <el-descriptions-item label="发现时间">{{ formatValue(record.reportedAt) }}</el-descriptions-item>
+                <el-descriptions-item label="创建人">{{ formatValue(record.createdByName) }}</el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ formatValue(record.createdAt) }}</el-descriptions-item>
                 <el-descriptions-item label="分配人">{{ formatValue(record.assignedByName) }}</el-descriptions-item>
                 <el-descriptions-item label="分配时间">{{ formatValue(record.assignedAt) }}</el-descriptions-item>
-                <el-descriptions-item label="整改责任人">{{
-                    formatValue(record.rectificationUserName)
-                }}</el-descriptions-item>
-                <el-descriptions-item label="整改截止时间">{{
-                    formatValue(record.rectificationDeadline)
-                }}</el-descriptions-item>
+                <el-descriptions-item label="负责人">{{ formatValue(record.assigneeName) }}</el-descriptions-item>
+                <el-descriptions-item label="截止日期">{{ formatValue(record.dueDate) }}</el-descriptions-item>
+                <el-descriptions-item label="确认状态">{{ formatConfirmed(record.confirmed) }}</el-descriptions-item>
+                <el-descriptions-item label="解决方案">{{ formatValue(record.resolution) }}</el-descriptions-item>
                 <el-descriptions-item label="整改次数">{{
                     formatValue(record.rectificationCount)
                 }}</el-descriptions-item>
@@ -81,7 +79,6 @@
                 <el-descriptions-item label="关闭人">{{ formatValue(record.closedByName) }}</el-descriptions-item>
                 <el-descriptions-item label="关闭时间">{{ formatValue(record.closedAt) }}</el-descriptions-item>
                 <el-descriptions-item label="状态">{{ formatIssueStatus(record.status) }}</el-descriptions-item>
-                <el-descriptions-item label="创建时间">{{ formatValue(record.createdAt) }}</el-descriptions-item>
                 <el-descriptions-item label="更新时间">{{ formatValue(record.updatedAt) }}</el-descriptions-item>
             </el-descriptions>
             <el-empty v-else-if="!loading" description="暂无详情数据" />
@@ -145,16 +142,18 @@ export default {
             if (value === null || value === undefined || value === '') return '-'
             switch (String(value)) {
                 case '1':
-                    return '待整改'
+                    return '激活'
                 case '2':
-                    return '整改中'
+                    return '已解决'
                 case '3':
-                    return '待复验'
-                case '4':
                     return '已关闭'
                 default:
                     return value
             }
+        },
+        formatConfirmed(value) {
+            if (value === null || value === undefined || value === '') return '-'
+            return Number(value) === 1 ? '已确认' : '未确认'
         },
         parseAttachments(value) {
             return parseAttachmentArray(value)

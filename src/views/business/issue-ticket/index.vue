@@ -29,10 +29,9 @@
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="query.status" clearable placeholder="请选择状态">
-                        <el-option label="待整改" :value="1" />
-                        <el-option label="整改中" :value="2" />
-                        <el-option label="待复验" :value="3" />
-                        <el-option label="已关闭" :value="4" />
+                        <el-option label="激活" :value="1" />
+                        <el-option label="已解决" :value="2" />
+                        <el-option label="已关闭" :value="3" />
                     </el-select>
                 </el-form-item>
                 <el-form-item
@@ -73,34 +72,54 @@
                     <template slot-scope="scope">{{ formatValue(scope.row.projectName) }}</template>
                 </el-table-column>
                 <el-table-column
-                    prop="reportedByName"
-                    label="发现人"
+                    prop="createdByName"
+                    label="创建人"
                     width="100"
                     align="center"
                     header-align="center"
                     show-overflow-tooltip
                 >
-                    <template slot-scope="scope">{{ formatValue(scope.row.reportedByName) }}</template>
+                    <template slot-scope="scope">{{ formatValue(scope.row.createdByName) }}</template>
                 </el-table-column>
                 <el-table-column
-                    prop="rectificationUserName"
-                    label="整改责任人"
+                    prop="assigneeName"
+                    label="负责人"
                     width="110"
                     align="center"
                     header-align="center"
                     show-overflow-tooltip
                 >
-                    <template slot-scope="scope">{{ formatValue(scope.row.rectificationUserName) }}</template>
+                    <template slot-scope="scope">{{ formatValue(scope.row.assigneeName) }}</template>
                 </el-table-column>
                 <el-table-column
-                    prop="rectificationDeadline"
-                    label="整改截止时间"
-                    width="170"
+                    prop="dueDate"
+                    label="截止日期"
+                    width="120"
                     align="center"
                     header-align="center"
                     show-overflow-tooltip
                 >
-                    <template slot-scope="scope">{{ formatValue(scope.row.rectificationDeadline) }}</template>
+                    <template slot-scope="scope">{{ formatValue(scope.row.dueDate) }}</template>
+                </el-table-column>
+                <el-table-column
+                    prop="resolution"
+                    label="解决方案"
+                    width="130"
+                    align="center"
+                    header-align="center"
+                    show-overflow-tooltip
+                >
+                    <template slot-scope="scope">{{ formatValue(scope.row.resolution) }}</template>
+                </el-table-column>
+                <el-table-column
+                    prop="confirmed"
+                    label="确认状态"
+                    width="100"
+                    align="center"
+                    header-align="center"
+                    show-overflow-tooltip
+                >
+                    <template slot-scope="scope">{{ formatConfirmed(scope.row.confirmed) }}</template>
                 </el-table-column>
                 <el-table-column
                     prop="status"
@@ -174,16 +193,18 @@ export default {
             if (value === null || value === undefined || value === '') return '-'
             switch (String(value)) {
                 case '1':
-                    return '待整改'
+                    return '激活'
                 case '2':
-                    return '整改中'
+                    return '已解决'
                 case '3':
-                    return '待复验'
-                case '4':
                     return '已关闭'
                 default:
                     return value
             }
+        },
+        formatConfirmed(value) {
+            if (value === null || value === undefined || value === '') return '-'
+            return Number(value) === 1 ? '已确认' : '未确认'
         },
         buildParams() {
             return { ...this.query }
