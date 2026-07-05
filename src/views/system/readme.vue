@@ -519,6 +519,10 @@ export default {
     background: #1264f6;
 }
 
+.dot-green {
+    background: #10b981;
+}
+
 .dot-gray {
     background: #9aa8bc;
 }
