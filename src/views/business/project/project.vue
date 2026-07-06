@@ -53,13 +53,16 @@
                 label="计划结束"
                 width="120"
                 align="center"
+            /><el-table-column prop="warrantyMonths" label="保修月数" width="100" align="center"
             /><el-table-column label="操作" width="190" fixed="right" align="center"
                 ><template slot-scope="s"
                     ><el-button type="text" @click="$router.push({ path: '/projectEdit', query: { id: s.row.id } })"
                         >编辑</el-button
                     ><el-button v-if="Number(s.row.status) === 1" type="text" @click="start(s.row)">启动</el-button
-                    ><el-button v-if="Number(s.row.status) === 1" type="text" class="danger" @click="remove(s.row)"
-                        >删除</el-button
+                    ><el-button v-if="Number(s.row.status) === 1" type="text" class="danger" @click="cancel(s.row)"
+                        >取消</el-button
+                    ><el-button v-if="Number(s.row.status) === 2" type="text" @click="pause(s.row)">暂停</el-button
+                    ><el-button v-if="Number(s.row.status) === 3" type="text" @click="resume(s.row)">恢复</el-button
                     ></template
                 ></el-table-column
             ></el-table
@@ -84,15 +87,14 @@ export default {
             loading: false,
             rows: [],
             total: 0,
-            query: { pageNo: 1, pageSize: 10, code: '', name: '', status: '' },
+            query: { pageNo: 1, pageSize: 10, companyId: localStorage.getItem('companyId'), code: '', name: '', status: '' },
             statuses: [
                 { label: '待启动', value: 1 },
                 { label: '进行中', value: 2 },
                 { label: '暂停', value: 3 },
                 { label: '已交付', value: 4 },
-                { label: '售后中', value: 5 },
-                { label: '已完结', value: 6 },
-                { label: '已取消', value: 7 }
+                { label: '已完结', value: 5 },
+                { label: '已取消', value: 6 }
             ]
         }
     },
@@ -107,6 +109,7 @@ export default {
         async load() {
             this.loading = true
             try {
+                this.query.companyId = localStorage.getItem('companyId')
                 let r = await this.$axios.get('project/queryByPage', { params: this.query })
                 if (r.data.code === 200) {
                     this.rows = r.data.data.list
@@ -137,21 +140,54 @@ export default {
         },
         start(row) {
             this.$confirm('确认启动项目“' + row.name + '”吗？', '提示', { type: 'warning' }).then(async () => {
-                let r = await this.$axios.post('project/start/' + row.id)
+                let r = await this.$axios.post('project/start/' + row.id, { userId: localStorage.getItem('userId') })
                 if (r.data.code === 200) {
                     this.$message.success('启动成功')
                     this.load()
                 } else this.$message.error(r.data.message)
             })
         },
-        remove(row) {
-            if (Number(row.status) !== 1) {
-                return this.$message.warning('项目启动后不能删除')
-            }
-            this.$confirm('确认删除项目“' + row.name + '”吗？', '提示', { type: 'warning' }).then(async () => {
-                let r = await this.$axios.post('project/delete/' + row.id)
+        cancel(row) {
+            this.$prompt('请输入取消原因', '取消项目“' + row.name + '”', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputType: 'textarea',
+                inputValidator: value => Boolean(value && value.trim()),
+                inputErrorMessage: '取消原因不能为空'
+            }).then(async ({ value }) => {
+                let r = await this.$axios.post('project/cancel/' + row.id, {
+                    cancelReason: value,
+                    userId: localStorage.getItem('userId')
+                })
                 if (r.data.code === 200) {
-                    this.$message.success('删除成功')
+                    this.$message.success('取消成功')
+                    this.load()
+                } else this.$message.error(r.data.message)
+            })
+        },
+        pause(row) {
+            this.$prompt('请输入暂停原因', '暂停项目“' + row.name + '”', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputType: 'textarea',
+                inputValidator: value => Boolean(value && value.trim()),
+                inputErrorMessage: '暂停原因不能为空'
+            }).then(async ({ value }) => {
+                let r = await this.$axios.post('project/pause/' + row.id, {
+                    pauseReason: value,
+                    userId: localStorage.getItem('userId')
+                })
+                if (r.data.code === 200) {
+                    this.$message.success('暂停成功')
+                    this.load()
+                } else this.$message.error(r.data.message)
+            })
+        },
+        resume(row) {
+            this.$confirm('确认恢复项目“' + row.name + '”吗？', '提示', { type: 'warning' }).then(async () => {
+                let r = await this.$axios.post('project/resume/' + row.id, { userId: localStorage.getItem('userId') })
+                if (r.data.code === 200) {
+                    this.$message.success('恢复成功')
                     this.load()
                 } else this.$message.error(r.data.message)
             })

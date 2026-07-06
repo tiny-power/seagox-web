@@ -37,6 +37,13 @@
                             :min="0"
                             :precision="2"
                             :controls="false" /></el-form-item></el-col
+                ><el-col :span="8"
+                    ><el-form-item label="保修月份"
+                        ><el-input-number
+                            v-model="form.warrantyMonths"
+                            :min="0"
+                            :precision="0"
+                            :controls="false" /></el-form-item></el-col
             ></el-row>
             <el-row :gutter="20"
                 ><el-col :span="8"
@@ -61,29 +68,9 @@
                             type="date" /></el-form-item></el-col
             ></el-row>
             <el-row :gutter="20"
-                ><el-col :span="8"
-                    ><el-form-item label="封面" prop="cover">
-                        <div class="cover-field" :class="{ 'has-cover': form.cover }">
-                            <el-upload
-                                class="cover-uploader"
-                                action=""
-                                accept="image/*"
-                                list-type="picture-card"
-                                :file-list="coverFileList"
-                                :limit="1"
-                                :before-upload="beforeCoverUpload"
-                                :http-request="uploadCover"
-                                :on-preview="previewCover"
-                                :on-remove="removeCover"
-                            >
-                                <i v-if="!coverUploading" class="el-icon-plus" />
-                                <i v-else class="el-icon-loading" />
-                            </el-upload>
-                        </div>
-                    </el-form-item></el-col
                 ><el-col v-if="form.status === 3" :span="16"
                     ><el-form-item label="暂停原因"><el-input v-model="form.pauseReason" /></el-form-item></el-col
-                ><el-col v-if="form.status === 7" :span="16"
+                ><el-col v-if="form.status === 6" :span="16"
                     ><el-form-item label="取消原因"><el-input v-model="form.cancelReason" /></el-form-item></el-col
             ></el-row>
         </el-form>
@@ -299,7 +286,6 @@ export default {
         return {
             loading: false,
             saving: false,
-            coverUploading: false,
             activeTab: 'roles',
             users: [],
             members: [],
@@ -331,10 +317,10 @@ export default {
                 pauseReason: '',
                 cancelReason: '',
                 plannedStartDate: '',
-                plannedEndDate: ''
+                plannedEndDate: '',
+                warrantyMonths: 12
             },
             rules: {
-                cover: [{ required: true, message: '请上传封面', trigger: 'change' }],
                 code: [{ required: true, message: '请输入项目编号', trigger: 'blur' }],
                 name: [{ required: true, message: '请输入项目名称', trigger: 'blur' }],
                 address: [{ required: true, message: '请输入项目地址', trigger: 'blur' }],
@@ -349,9 +335,8 @@ export default {
                 { label: '进行中', value: 2 },
                 { label: '暂停', value: 3 },
                 { label: '已交付', value: 4 },
-                { label: '售后中', value: 5 },
-                { label: '已完结', value: 6 },
-                { label: '已取消', value: 7 }
+                { label: '已完结', value: 5 },
+                { label: '已取消', value: 6 }
             ],
             flowTypeOptions: [
                 { label: '筹备', value: 1 },
@@ -379,11 +364,6 @@ export default {
     created() {
         this.loadUsers()
         this.loadDetail()
-    },
-    computed: {
-        coverFileList() {
-            return this.form.cover ? [{ name: '项目封面', url: this.form.cover }] : []
-        }
     },
     methods: {
         newStage() {
@@ -433,45 +413,6 @@ export default {
                 stage.predecessorKeys = (stage.predecessorKeys || []).filter(key => key !== removedKey)
             })
             this.stages.forEach((s, n) => (s.sortOrder = n + 1))
-        },
-        beforeCoverUpload(file) {
-            if (!file.type || file.type.indexOf('image/') !== 0) {
-                this.$message.error('只能上传图片文件')
-                return false
-            }
-            if (file.size / 1024 / 1024 > 5) {
-                this.$message.error('封面图片大小不能超过5MB')
-                return false
-            }
-            return true
-        },
-        async uploadCover(options) {
-            let formData = new FormData()
-            formData.append('file', options.file)
-            this.coverUploading = true
-            try {
-                let response = await this.$axios.post('upload/putObject/oss', formData)
-                if (response.data.code === 200) {
-                    this.form.cover = response.data.data
-                    this.$nextTick(() => this.$refs.form && this.$refs.form.validateField('cover'))
-                    this.$message.success('封面上传成功')
-                } else {
-                    this.$message.error(response.data.message)
-                }
-            } catch (error) {
-                this.$message.error('封面上传失败')
-            } finally {
-                this.coverUploading = false
-            }
-        },
-        previewCover(file) {
-            if (file.url) {
-                window.open(file.url, '_blank')
-            }
-        },
-        removeCover() {
-            this.form.cover = ''
-            this.$nextTick(() => this.$refs.form && this.$refs.form.validateField('cover'))
         },
         async loadUsers() {
             let r = await this.$axios.get('user/queryByPage', {
@@ -614,7 +555,11 @@ export default {
                 this.saving = true
                 let payload = { project: this.form, members: this.members, stages: this.stages }
                 let url = 'project/update'
-                let r = await this.$axios.post(url, { projectData: JSON.stringify(payload) })
+                let r = await this.$axios.post(url, {
+                    projectData: JSON.stringify(payload),
+                    userId: localStorage.getItem('userId'),
+                    companyId: localStorage.getItem('companyId')
+                })
                 this.saving = false
                 if (r.data.code === 200) {
                     this.$message.success('保存成功')
@@ -658,57 +603,6 @@ export default {
 }
 ::v-deep .project-data-table .el-input__inner {
     text-align: center;
-}
-.cover-field {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    overflow: hidden;
-}
-::v-deep .cover-uploader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 120px;
-    height: 120px;
-}
-::v-deep .cover-uploader .el-upload--picture-card,
-::v-deep .cover-uploader .el-upload-list--picture-card .el-upload-list__item {
-    width: 120px;
-    height: 120px;
-    line-height: 120px;
-    vertical-align: top;
-}
-::v-deep .cover-uploader .el-upload-list--picture-card {
-    display: block;
-    height: 120px;
-    line-height: 0;
-}
-::v-deep .cover-uploader .el-upload-list--picture-card .el-list-enter-active,
-::v-deep .cover-uploader .el-upload-list--picture-card .el-list-leave-active {
-    transition: none;
-}
-::v-deep .cover-uploader .el-upload-list--picture-card .el-upload-list__item {
-    margin: 0;
-    transition: none;
-}
-::v-deep .cover-uploader .el-upload-list--picture-card .el-upload-list__item-thumbnail {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-}
-.cover-field:not(.has-cover) ::v-deep .cover-uploader .el-upload-list {
-    display: none;
-}
-.has-cover ::v-deep .cover-uploader .el-upload--picture-card {
-    display: none;
-}
-::v-deep .cover-uploader .el-upload-list__item-actions {
-    line-height: 120px;
-}
-::v-deep .cover-uploader .el-upload-list__item-actions span {
-    line-height: 1;
-    vertical-align: middle;
 }
 .user-dialog-toolbar {
     display: flex;
