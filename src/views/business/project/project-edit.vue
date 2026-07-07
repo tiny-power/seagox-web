@@ -31,17 +31,17 @@
             ></el-row>
             <el-row :gutter="20"
                 ><el-col :span="8"
-                    ><el-form-item label="预算金额"
+                    ><el-form-item label="预算金额" prop="budgetAmount"
                         ><el-input-number
                             v-model="form.budgetAmount"
-                            :min="0"
+                            :min="0.01"
                             :precision="2"
                             :controls="false" /></el-form-item></el-col
                 ><el-col :span="8"
-                    ><el-form-item label="保修月份"
+                    ><el-form-item label="保修月份" prop="warrantyMonths"
                         ><el-input-number
                             v-model="form.warrantyMonths"
-                            :min="0"
+                            :min="1"
                             :precision="0"
                             :controls="false" /></el-form-item></el-col
             ></el-row>
@@ -311,7 +311,7 @@ export default {
                 address: '',
                 ownerName: '',
                 ownerPhone: '',
-                budgetAmount: 0,
+                budgetAmount: null,
                 status: 1,
                 healthStatus: 1,
                 pauseReason: '',
@@ -326,9 +326,17 @@ export default {
                 address: [{ required: true, message: '请输入项目地址', trigger: 'blur' }],
                 ownerName: [{ required: true, message: '请输入业主姓名', trigger: 'blur' }],
                 ownerPhone: [{ required: true, message: '请输入业主联系电话', trigger: 'blur' }],
+                budgetAmount: [
+                    { required: true, message: '请输入预算金额', trigger: 'change' },
+                    { type: 'number', min: 0.01, message: '预算金额必须大于0', trigger: 'change' }
+                ],
                 status: [{ required: true, message: '请选择状态', trigger: 'change' }],
                 plannedStartDate: [{ required: true, message: '请选择计划开始日期', trigger: 'change' }],
-                plannedEndDate: [{ required: true, message: '请选择计划结束日期', trigger: 'change' }]
+                plannedEndDate: [{ required: true, message: '请选择计划结束日期', trigger: 'change' }],
+                warrantyMonths: [
+                    { required: true, message: '请输入保修月数', trigger: 'change' },
+                    { type: 'number', min: 1, message: '保修月数必须大于0', trigger: 'change' }
+                ]
             },
             statusOptions: [
                 { label: '待启动', value: 1 },
@@ -500,11 +508,6 @@ export default {
             if (this.stages.some(x => !x.flowType)) {
                 this.activeTab = 'stages'
                 this.$message.warning('请选择项目阶段流程类型')
-                return false
-            }
-            if (!this.stages.some(x => x.flowType === 5) || !this.stages.some(x => x.flowType === 6)) {
-                this.activeTab = 'stages'
-                this.$message.warning('项目阶段流程类型至少包含交付和售后')
                 return false
             }
             if (this.stages.some(x => !x.plannedStartDate || !x.plannedEndDate)) {
