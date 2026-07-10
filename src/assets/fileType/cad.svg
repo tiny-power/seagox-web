@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 88 88">
+  <defs>
+    <linearGradient id="cad-bg" x1="15" y1="12" x2="73" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2775FF"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <path d="M18 8h36l16 16v56H18z" fill="url(#cad-bg)"/>
+  <path d="M54 8v16h16z" fill="#A7F3D0" opacity=".75"/>
+  <path d="M27 35h34v23H27z" fill="none" stroke="#fff" stroke-width="3"/>
+  <path d="M34 42h20M34 50h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <text x="44" y="72" fill="#fff" font-family="Arial,sans-serif" font-size="13" font-weight="700" text-anchor="middle">CAD</text>
+</svg>

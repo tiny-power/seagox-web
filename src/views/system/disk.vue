@@ -146,7 +146,8 @@ export default {
                 8: require('@/assets/fileType/txt.svg'),
                 9: require('@/assets/fileType/document.svg'),
                 10: require('@/assets/fileType/video.svg'),
-                11: require('@/assets/fileType/other.svg')
+                11: require('@/assets/fileType/other.svg'),
+                12: require('@/assets/fileType/cad.svg')
             }
         }
     },
@@ -283,9 +284,21 @@ export default {
             this.queryChildren()
         },
         previewFile(row) {
-            if (row.url) {
-                window.open(row.url, '_blank')
+            if (!row.url) {
+                return
             }
+            if (this.isCadFile(row)) {
+                this.previewCadFile(row)
+                return
+            }
+            window.open(row.url, '_blank')
+        },
+        previewCadFile(row) {
+            window.open(this.getCadPreviewUrl(row), '_blank')
+        },
+        isCadFile(row) {
+            const suffix = this.getFileSuffix(row.name || row.url || '')
+            return row.type === 12 || ['dwg', 'dxf', 'dwt'].includes(suffix)
         },
         fileIcon(row) {
             return this.iconMap[row.type] || this.iconMap[11]
@@ -302,7 +315,8 @@ export default {
                 8: 'TXT',
                 9: '文档',
                 10: '视频',
-                11: '其他'
+                11: '其他',
+                12: 'CAD'
             }
             return map[row.type] || '其他'
         },
@@ -320,7 +334,7 @@ export default {
             return (size / 1024 / 1024).toFixed(1) + 'MB'
         },
         getFileType(filename) {
-            const suffix = (filename.split('.').pop() || '').toLowerCase()
+            const suffix = this.getFileSuffix(filename)
             if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(suffix)) return 2
             if (['doc', 'docx'].includes(suffix)) return 3
             if (['xls', 'xlsx'].includes(suffix)) return 4
@@ -330,7 +344,30 @@ export default {
             if (suffix === 'txt') return 8
             if (['md', 'rtf', 'ofd'].includes(suffix)) return 9
             if (['mp4', 'avi', 'mov', 'wmv', 'mkv'].includes(suffix)) return 10
+            if (['dwg', 'dxf', 'dwt'].includes(suffix)) return 12
             return 11
+        },
+        getFileSuffix(filename) {
+            const cleanName = String(filename || '').split('?')[0]
+            const lastSeparatorIndex = Math.max(cleanName.lastIndexOf('/'), cleanName.lastIndexOf('\\'))
+            const basename = cleanName.slice(lastSeparatorIndex + 1)
+            const dotIndex = basename.lastIndexOf('.')
+            if (dotIndex === -1) {
+                return ''
+            }
+            return basename
+                .slice(dotIndex + 1)
+                .split('#')[0]
+                .toLowerCase()
+        },
+        getCadPreviewUrl(row) {
+            const baseUrl = process.env.BASE_URL || '/'
+            const params = new URLSearchParams({
+                src: row.url,
+                name: row.name || 'CAD预览',
+                id: String(row.id || Date.now())
+            })
+            return baseUrl.replace(/\/?$/, '/') + 'cad-preview.html?' + params.toString()
         }
     }
 }
@@ -386,4 +423,5 @@ export default {
     height: 28px;
     margin-right: 10px;
 }
+
 </style>

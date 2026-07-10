@@ -1,6 +1,16 @@
 const CompressionPlugin = require('compression-webpack-plugin')
 const ThemeColorReplacer = require('webpack-theme-color-replacer')
 const forElementUI = require('webpack-theme-color-replacer/forElementUI')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const path = require('path')
+
+const xViewerCopyPlugin = new CopyWebpackPlugin([
+    {
+        from: path.resolve(__dirname, 'node_modules/@x-viewer/core/dist'),
+        to: 'x-viewer/core'
+    }
+])
+
 module.exports = {
     runtimeCompiler: true,
     productionSourceMap: false,
@@ -34,6 +44,7 @@ module.exports = {
             config.mode = 'production'
             return {
                 plugins: [
+                    xViewerCopyPlugin,
                     new CompressionPlugin({
                         test: /\.js$|\.html$|\.css/, //匹配文件名
                         threshold: 10240, //对超过10k的数据进行压缩
@@ -50,6 +61,7 @@ module.exports = {
         } else {
             return {
                 plugins: [
+                    xViewerCopyPlugin,
                     new ThemeColorReplacer({
                         matchColors: [...forElementUI.getElementUISeries('#409EFF')],
                         fileName: 'css/theme-colors-[contenthash:8].css',

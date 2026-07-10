@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAD预览</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #f5f7fa;
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+        }
+
+        #cadPreviewContainer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .viewer-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            max-width: 80%;
+            transform: translate(-50%, -50%);
+            color: #606266;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="cadPreviewContainer"></div>
+    <div id="viewerMessage" class="viewer-message">CAD文件加载中</div>
+
+    <script type="module">
+        var params = new URLSearchParams(window.location.search)
+        var src = params.get('src')
+        var name = params.get('name') || 'CAD预览'
+        var modelId = params.get('id') || String(Date.now())
+        var messageEl = document.getElementById('viewerMessage')
+
+        document.title = name
+
+        function showError(error) {
+            messageEl.textContent = (error && error.message) || 'CAD文件预览失败'
+        }
+
+        function loadCad() {
+            if (!src) {
+                messageEl.textContent = '缺少CAD文件地址'
+                return
+            }
+
+            import('./x-viewer/core/index.esm.js')
+                .then(function(module) {
+                    var Viewer2d = module.Viewer2d
+                    var viewer = new Viewer2d({
+                        containerId: 'cadPreviewContainer',
+                        enableSpinner: true,
+                        enableLayoutBar: true
+                    })
+                    return viewer.loadModel({
+                        modelId: modelId,
+                        name: name,
+                        src: src
+                    }).then(function() {
+                        viewer.goToHomeView()
+                        messageEl.style.display = 'none'
+                    })
+                })
+                .catch(showError)
+        }
+
+        loadCad()
+    </script>
+</body>
+</html>
