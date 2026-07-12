@@ -10,7 +10,7 @@
             <el-table :data="tableData" border highlight-current-row stripe :height="clientHeight - 185">
                 <el-table-column type="index" label="序号" width="50" align="center"></el-table-column>
                 <el-table-column prop="name" label="名称" align="center"></el-table-column>
-                <el-table-column prop="createTime" label="创建时间" align="center"></el-table-column>
+                <el-table-column prop="createdAt" label="创建时间" align="center"></el-table-column>
                 <el-table-column label="操作" align="center">
                     <template slot-scope="scope">
                         <el-button

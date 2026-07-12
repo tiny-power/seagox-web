@@ -98,7 +98,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="submitTime" label="提交时间" align="center" width="160"></el-table-column>
-                <el-table-column prop="createTime" label="创建时间" align="center" width="160"></el-table-column>
+                <el-table-column prop="createdAt" label="创建时间" align="center" width="160"></el-table-column>
                 <el-table-column label="操作" align="center" width="260">
                     <template slot-scope="scope">
                         <el-button

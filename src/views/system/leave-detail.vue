@@ -52,7 +52,7 @@
                             </el-col>
                             <el-col :span="8">
                                 <el-form-item label="创建时间">
-                                    <el-input :value="leaveForm.createTime" disabled></el-input>
+                                    <el-input :value="leaveForm.createdAt" disabled></el-input>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="24">
