@@ -99,7 +99,7 @@ export default {
             return this.parseAssistants(this.record.assistants || this.record.contacts || this.record.cooperators)
         },
         attachmentImages() {
-            return this.parseAttachments(this.record.attachment || this.record.attachments)
+            return this.parseAttachments(this.record.attachments)
         },
         previewImages() {
             return this.attachmentImages.map(item => item.url)

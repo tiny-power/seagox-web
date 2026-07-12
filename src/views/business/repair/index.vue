@@ -58,7 +58,8 @@
                 <div class="detail-row"><span>维修人员</span><b>{{ detail.repairMemberName || '待指派' }}</b></div>
                 <div class="detail-row"><span>预计上门</span><b>{{ detail.expectedVisitAt || '-' }}</b></div>
                 <div class="detail-row"><span>报修时间</span><b>{{ detail.repairAt || '-' }}</b></div>
-                <div class="detail-row"><span>完成时间</span><b>{{ detail.completeAt || '-' }}</b></div>
+                <div class="detail-row"><span>维修完成时间</span><b>{{ detail.repairedAt || '-' }}</b></div>
+                <div class="detail-row"><span>验收时间</span><b>{{ detail.acceptedAt || '-' }}</b></div>
                 <div class="detail-row"><span>状态</span><b>{{ detail.statusText || '-' }}</b></div>
                 <div class="detail-row"><span>维修说明</span><b>{{ detail.repairResult || '-' }}</b></div>
                 <attachment-block title="维修前附件" :files="parseAttachments(detail.beforeAttachments)" />
