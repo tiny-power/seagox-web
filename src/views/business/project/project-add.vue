@@ -87,8 +87,8 @@
                     ><el-table-column label="状态" align="center" width="130"
                         ><template slot-scope="s"
                             ><el-select v-model="s.row.status"
-                                ><el-option label="有效" :value="1" /><el-option
-                                    label="无效"
+                                ><el-option label="在项目中" :value="1" /><el-option
+                                    label="已退出"
                                     :value="2" /></el-select></template></el-table-column
                     ><el-table-column label="操作" width="80" align="center"
                         ><template slot-scope="s"
