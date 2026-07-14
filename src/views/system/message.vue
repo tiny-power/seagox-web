@@ -21,7 +21,7 @@
                     <template slot-scope="scope">
                         <i v-if="scope.row.classify == '3'" class="el-icon-warning" style="color: red"></i>
                         <i v-if="scope.row.classify == '2'" class="el-icon-warning" style="color: #e6a23c"></i>
-                        <span v-if="scope.row.type == 2" v-html="scope.row.title"></span>
+                        <span v-if="scope.row.type == 1" v-html="scope.row.title"></span>
                         <span v-else>{{ scope.row.title }}</span>
                     </template>
                 </el-table-column>
