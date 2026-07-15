@@ -68,7 +68,7 @@ const routes = [
             {
                 name: 'leave',
                 path: '/leave',
-                component: () => import('@/views/system/leave'),
+                component: () => import('@/views/business/leave'),
                 meta: {
                     title: '请假单'
                 }
@@ -76,7 +76,7 @@ const routes = [
             {
                 name: 'leaveDetail',
                 path: '/leaveDetail',
-                component: () => import('@/views/system/leave-detail'),
+                component: () => import('@/views/business/leave-detail'),
                 meta: {
                     title: '请假单详情'
                 }
@@ -251,7 +251,7 @@ const routes = [
             {
                 name: 'disk',
                 path: '/disk',
-                component: () => import('@/views/system/disk'),
+                component: () => import('@/views/business/disk'),
                 meta: {
                     title: '知识库'
                 }

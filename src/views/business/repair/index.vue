@@ -200,7 +200,7 @@ export default {
 
 <style scoped>
 .document-page {
-    padding: 20px;
+    padding: 12px;
     height: 100%;
     overflow: hidden;
     display: flex;
@@ -209,13 +209,25 @@ export default {
 }
 
 .filter-form {
-    margin-bottom: 4px;
+    margin-bottom: 12px;
     flex: none;
 }
 
 .filter-form .el-input,
 .filter-form .el-select {
     width: 170px;
+}
+
+::v-deep .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 12px;
+}
+
+::v-deep .filter-form .el-form-item {
+    margin-bottom: 0;
 }
 
 .rounded-table {

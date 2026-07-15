@@ -1,37 +1,36 @@
 <template>
-    <div>
-        <div class="searchView" style="padding-top: 10px">
-            <el-form label-width="60px" :inline="true" size="medium">
-                <el-form-item label="标题">
-                    <el-input v-model="searchContent.title" placeholder="请输入标题" clearable> </el-input>
-                </el-form-item>
-                <el-form-item label="类别">
-                    <el-select
-                        v-model="searchContent.businessType"
-                        multiple
-                        clearable
-                        placeholder="请选择类别"
-                        filterable
-                        collapse-tags
+    <div class="document-page">
+        <el-form label-width="60px" :inline="true" :model="searchContent" class="filter-form" @submit.native.prevent>
+            <el-form-item label="标题">
+                <el-input v-model="searchContent.title" placeholder="请输入标题" clearable> </el-input>
+            </el-form-item>
+            <el-form-item label="类别">
+                <el-select
+                    v-model="searchContent.businessType"
+                    multiple
+                    clearable
+                    placeholder="请选择类别"
+                    filterable
+                    collapse-tags
+                >
+                    <el-option
+                        v-for="item in businessTypeOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
                     >
-                        <el-option
-                            v-for="item in businessTypeOptions"
-                            :key="item.id"
-                            :label="item.name"
-                            :value="item.id"
-                        >
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" icon="el-icon-search" @click.native="handleSearch">查询</el-button>
-                    <el-button type="primary" plain icon="el-icon-check" @click.native="handleBatch">提交</el-button>
-                </el-form-item>
-            </el-form>
-        </div>
-        <div class="table">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
+                <el-button type="primary" plain icon="el-icon-check" @click="handleBatch">提交</el-button>
+            </el-form-item>
+        </el-form>
+        <div class="table-wrapper">
             <!--列表-->
             <el-table
+                class="project-data-table rounded-table"
                 :data="tableData"
                 border
                 stripe
@@ -39,7 +38,7 @@
                 row-key="id"
                 :row-style="{ cursor: 'pointer' }"
                 @selection-change="handleSelectionChange"
-                :height="clientHeight - 205"
+                height="100%"
             >
                 <el-table-column type="selection" width="55"> </el-table-column>
                 <el-table-column type="index" label="序号" width="50" align="center"></el-table-column>
@@ -51,19 +50,18 @@
                     show-overflow-tooltip
                 ></el-table-column>
             </el-table>
-            <!--分页-->
-            <div class="pagination">
-                <el-pagination
-                    background
-                    @current-change="handleCurrentChange"
-                    layout="total, prev, pager, next"
-                    :page-size="pageSize"
-                    :current-page.sync="pageNo"
-                    :total="total"
-                >
-                </el-pagination>
-            </div>
         </div>
+        <!--分页-->
+        <el-pagination
+            background
+            layout="total, sizes, prev, pager, next, jumper"
+            :page-size="pageSize"
+            :current-page="pageNo"
+            :page-sizes="[10, 20, 50, 100]"
+            :total="total"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+        />
         <el-dialog title="提交提示" width="550px" :visible.sync="validVisible" :close-on-click-modal="false">
             <div style="padding-bottom: 15px; max-height: 300px; overflow: auto">
                 <div>
@@ -88,7 +86,6 @@
 export default {
     data() {
         return {
-            clientHeight: document.documentElement.clientHeight || document.body.clientHeight,
             searchContent: {
                 title: '',
                 businessType: []
@@ -157,6 +154,7 @@ export default {
         queryByPage() {
             let params = {
                 pageNo: this.pageNo,
+                pageSize: this.pageSize,
                 name: this.searchContent.title,
                 businessTypeStr: this.searchContent.businessType.join(',')
             }
@@ -171,9 +169,16 @@ export default {
             })
         },
         handleSearch() {
+            this.pageNo = 1
             this.queryByPage()
         },
-        handleCurrentChange() {
+        handleCurrentChange(pageNo) {
+            this.pageNo = pageNo
+            this.queryByPage()
+        },
+        handleSizeChange(pageSize) {
+            this.pageSize = pageSize
+            this.pageNo = 1
             this.queryByPage()
         },
         handleSelectionChange(val) {
@@ -204,6 +209,58 @@ export default {
 }
 </script>
 <style scoped>
+.document-page {
+    padding: 12px;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.filter-form {
+    margin-bottom: 12px;
+    flex: none;
+}
+
+.filter-form .el-input,
+.filter-form .el-select {
+    width: 170px;
+}
+
+::v-deep .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 12px;
+}
+
+::v-deep .filter-form .el-form-item {
+    margin-bottom: 0;
+}
+
+.table-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.el-pagination {
+    margin-top: 16px;
+    text-align: right;
+    flex: none;
+}
+
+.rounded-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+::v-deep .project-data-table .el-table__cell {
+    text-align: center;
+}
+
 ::v-deep .el-dialog__body {
     padding: 10px 20px 0px 20px;
 }

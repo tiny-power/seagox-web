@@ -1,6 +1,6 @@
 <template>
     <div class="document-page">
-        <el-form :inline="true" size="medium" class="filter-form" @submit.native.prevent>
+        <el-form :inline="true" class="filter-form" @submit.native.prevent>
             <el-form-item>
                 <el-input
                     v-model.trim="keyword"
@@ -43,7 +43,7 @@
         </div>
         <div class="table-wrapper">
             <el-table
-                class="rounded-table"
+                class="project-data-table rounded-table"
                 :data="tableData"
                 :row-style="{ cursor: 'pointer' }"
                 border
@@ -65,7 +65,7 @@
                 <el-table-column label="类型" width="110" align="center" :formatter="typeFormatter"></el-table-column>
                 <el-table-column label="大小" width="120" align="center" :formatter="sizeFormatter"></el-table-column>
                 <el-table-column prop="updatedAt" label="更新时间" width="180" align="center"></el-table-column>
-                <el-table-column label="操作" width="240" align="center">
+                <el-table-column label="操作" width="240" align="center" fixed="right">
                     <template slot-scope="scope">
                         <el-button type="text" size="small" @click="previewFile(scope.row)" v-if="scope.row.type !== 1"
                             >打开</el-button
@@ -91,7 +91,7 @@
             </el-table>
         </div>
         <el-dialog title="新增文件夹" width="420px" :visible.sync="folderVisible" :close-on-click-modal="false">
-            <el-form :model="folderForm" :rules="formRules" ref="folderForm" label-width="80px">
+            <el-form :model="folderForm" :rules="formRules" ref="folderForm" label-width="55px">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model.trim="folderForm.name" placeholder="请输入文件夹名称"></el-input>
                 </el-form-item>
@@ -375,7 +375,7 @@ export default {
 
 <style scoped>
 .document-page {
-    padding: 20px;
+    padding: 12px;
     height: 100%;
     overflow: hidden;
     display: flex;
@@ -384,13 +384,30 @@ export default {
 }
 
 .filter-form {
-    margin-bottom: 0;
+    margin-bottom: 12px;
     flex: none;
+}
+
+.filter-form .el-input {
+    width: 170px;
+}
+
+::v-deep .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 12px;
+}
+
+::v-deep .filter-form .el-form-item {
+    margin-bottom: 0;
 }
 
 .upload-button {
     display: inline-block;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 .breadcrumb-row {
@@ -399,7 +416,6 @@ export default {
     min-height: 24px;
     padding: 0 0 8px;
     flex: none;
-    margin-top: -12px;
 }
 
 .rounded-table {
@@ -422,6 +438,10 @@ export default {
     width: 28px;
     height: 28px;
     margin-right: 10px;
+}
+
+::v-deep .project-data-table .el-table__cell {
+    text-align: center;
 }
 
 </style>

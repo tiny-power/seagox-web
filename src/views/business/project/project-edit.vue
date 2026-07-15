@@ -43,17 +43,16 @@
                             v-model="form.warrantyMonths"
                             :min="1"
                             :precision="0"
-                            :controls="false" /></el-form-item></el-col
-            ></el-row>
-            <el-row :gutter="20"
-                ><el-col :span="8"
+                            :controls="false" /></el-form-item
+                ></el-col>
+                <el-col :span="8"
                     ><el-form-item label="健康状态"
                         ><el-select v-model="form.healthStatus" disabled
-                            ><el-option label="正常" :value="1" /><el-option
-                                label="预警"
-                                :value="2" /><el-option label="滞后" :value="3" /><el-option
-                                label="异常"
-                                :value="4" /></el-select></el-form-item></el-col
+                            ><el-option label="正常" :value="1" /><el-option label="预警" :value="2" /><el-option
+                                label="滞后"
+                                :value="3" /><el-option label="异常" :value="4" /></el-select></el-form-item></el-col
+            ></el-row>
+            <el-row :gutter="20"
                 ><el-col :span="8"
                     ><el-form-item label="计划开始" prop="plannedStartDate"
                         ><el-date-picker
@@ -111,8 +110,8 @@
                             ></template
                         ></el-table-column
                     ></el-table
-                ></el-tab-pane
-            >
+                >
+            </el-tab-pane>
             <el-tab-pane name="stages">
                 <span slot="label"><span class="required-mark">*</span>项目阶段</span>
                 <div class="tab-tools">
@@ -517,7 +516,10 @@ export default {
             }
             if (
                 this.stages.some(
-                    x => !x.inspectionItems || !x.inspectionItems.length || x.inspectionItems.some(i => !i.name || !i.name.trim())
+                    x =>
+                        !x.inspectionItems ||
+                        !x.inspectionItems.length ||
+                        x.inspectionItems.some(i => !i.name || !i.name.trim())
                 )
             ) {
                 this.activeTab = 'stages'
@@ -581,6 +583,7 @@ export default {
 .project-page {
     padding: 20px 24px 80px;
 }
+
 .section-title {
     font-size: 16px;
     font-weight: 600;
@@ -588,49 +591,61 @@ export default {
     padding-left: 10px;
     margin-bottom: 20px;
 }
+
 .el-select,
 .el-date-editor,
 .el-input-number {
     width: 100%;
 }
+
 .tab-tools {
     margin-top: 1px;
     margin-bottom: 12px;
     text-align: right;
 }
+
 .member-name {
     color: #303133;
 }
+
 ::v-deep .project-data-table .el-table__cell {
     text-align: center;
 }
+
 ::v-deep .project-data-table .el-input__inner {
     text-align: center;
 }
+
 .user-dialog-toolbar {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
     margin-bottom: 12px;
 }
+
 .user-dialog-toolbar .el-input {
     width: 220px;
 }
+
 .el-dialog .el-pagination {
     margin-top: 14px;
     text-align: right;
 }
+
 .el-tabs {
     margin-top: 8px;
 }
+
 .required-mark {
     margin-right: 3px;
     color: #f56c6c;
 }
+
 .inspection-dialog-toolbar {
     margin-bottom: 12px;
     text-align: right;
 }
+
 .footer {
     position: fixed;
     z-index: 10;
@@ -642,6 +657,7 @@ export default {
     border-top: 1px solid #ebeef5;
     text-align: right;
 }
+
 .danger {
     color: #f56c6c;
 }

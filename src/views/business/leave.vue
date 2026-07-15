@@ -1,82 +1,73 @@
 <template>
-    <div class="leave-page" ref="page">
-        <div class="toolView">
-            <el-button type="text" icon="el-icon-plus" @click="showAddDialog" size="small" v-permission="'leave:add'"
-                >新增</el-button
-            >
-            <el-upload
-                style="display: inline; margin-left: 10px; margin-right: 10px"
-                :action="action"
-                :show-file-list="false"
-                accept=".xlsx,.xls"
-                :headers="headers"
-                :before-upload="beforeUpload"
-                :on-success="successHandle"
-            >
-                <el-button size="small" type="text" icon="el-icon-upload2" v-permission="'leave:import'"
-                    >导入</el-button
+    <div class="leave-page">
+        <el-form :inline="true" :model="searchForm" class="filter-form" @submit.native.prevent>
+            <el-form-item label="申请人">
+                <el-input v-model.trim="searchForm.applicantName" clearable placeholder="请输入申请人"></el-input>
+            </el-form-item>
+            <el-form-item label="类型">
+                <el-select v-model="searchForm.leaveType" clearable placeholder="请选择类型">
+                    <el-option
+                        v-for="item in leaveTypeOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="状态">
+                <el-select v-model="searchForm.status" clearable placeholder="请选择状态">
+                    <el-option
+                        v-for="item in statusOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="时间">
+                <el-date-picker
+                    v-model="searchForm.dateRange"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    value-format="yyyy-MM-dd"
+                ></el-date-picker>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
+                <el-button icon="el-icon-refresh-left" @click="resetSearch">重置</el-button>
+                <el-button type="primary" icon="el-icon-plus" @click="showAddDialog" v-permission="'leave:add'">新增</el-button>
+                <el-upload
+                    class="filter-upload"
+                    :action="action"
+                    :show-file-list="false"
+                    accept=".xlsx,.xls"
+                    :headers="headers"
+                    :before-upload="beforeUpload"
+                    :on-success="successHandle"
                 >
-            </el-upload>
-            <el-button
-                type="text"
-                icon="el-icon-download"
-                v-permission="'leave:download'"
-                @click="downloadTemplate('leaveModel.xlsx')"
-                size="small"
-                >下载模版</el-button
+                    <el-button icon="el-icon-upload2" v-permission="'leave:import'">导入</el-button>
+                </el-upload>
+                <el-button
+                    icon="el-icon-download"
+                    v-permission="'leave:download'"
+                    @click="downloadTemplate('leaveModel.xlsx')"
+                    >下载模版</el-button
+                >
+                <el-button icon="el-icon-download" v-permission="'leave:export'" @click="downloadLeave">导出</el-button>
+            </el-form-item>
+        </el-form>
+        <div class="table-wrapper">
+            <el-table
+                class="project-data-table rounded-table"
+                :data="tableData"
+                border
+                highlight-current-row
+                stripe
+                height="100%"
+                @row-dblclick="goDetail"
             >
-            <el-button
-                type="text"
-                icon="el-icon-download"
-                v-permission="'leave:export'"
-                @click="downloadLeave"
-                size="small"
-                >导出</el-button
-            >
-        </div>
-        <div class="searchView">
-            <el-form label-width="70px" :inline="true" size="medium">
-                <el-form-item label="申请人">
-                    <el-input v-model.trim="searchForm.applicantName" clearable placeholder="请输入申请人"></el-input>
-                </el-form-item>
-                <el-form-item label="类型">
-                    <el-select v-model="searchForm.leaveType" clearable placeholder="请选择类型">
-                        <el-option
-                            v-for="item in leaveTypeOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="状态">
-                    <el-select v-model="searchForm.status" clearable placeholder="请选择状态">
-                        <el-option
-                            v-for="item in statusOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="时间">
-                    <el-date-picker
-                        v-model="searchForm.dateRange"
-                        type="daterange"
-                        range-separator="至"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期"
-                        value-format="yyyy-MM-dd"
-                    ></el-date-picker>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" icon="el-icon-search" @click.native="handleSearch">查询</el-button>
-                    <el-button icon="el-icon-refresh-left" @click.native="resetSearch">重置</el-button>
-                </el-form-item>
-            </el-form>
-        </div>
-        <div class="table leave-table" ref="tableBox">
-            <el-table :data="tableData" border highlight-current-row stripe :height="tableHeight" @row-dblclick="goDetail">
                 <el-table-column type="index" label="序号" width="55" align="center"></el-table-column>
                 <el-table-column prop="applicantName" label="申请人" align="center" width="100"></el-table-column>
                 <el-table-column
@@ -99,7 +90,7 @@
                 </el-table-column>
                 <el-table-column prop="submitTime" label="提交时间" align="center" width="160"></el-table-column>
                 <el-table-column prop="createdAt" label="创建时间" align="center" width="160"></el-table-column>
-                <el-table-column label="操作" align="center" width="260">
+                <el-table-column label="操作" align="center" width="260" fixed="right">
                     <template slot-scope="scope">
                         <el-button
                             type="text"
@@ -149,17 +140,17 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="pagination">
-                <el-pagination
-                    background
-                    @current-change="handleCurrentChange"
-                    layout="total, prev, pager, next"
-                    :current-page.sync="pageNo"
-                    :total="total"
-                >
-                </el-pagination>
-            </div>
         </div>
+        <el-pagination
+            background
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            :page-size="pageSize"
+            :current-page="pageNo"
+            :page-sizes="[10, 20, 50, 100]"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+        />
         <el-dialog :title="dialogTitle" width="760px" :visible.sync="formVisible" :close-on-click-modal="false">
             <el-form :model="form" label-width="90px" :rules="formRules" ref="form">
                 <el-row :gutter="16">
@@ -237,9 +228,9 @@ export default {
             headers: {
                 Authorization: localStorage.getItem('Authorization')
             },
-            tableHeight: 300,
             tableData: [],
             pageNo: 1,
+            pageSize: 10,
             total: 0,
             searchForm: {
                 applicantName: '',
@@ -293,35 +284,11 @@ export default {
         this.headers.Timestamp = timestamp
         this.queryByPage()
     },
-    mounted() {
-        this.setTableHeight()
-        window.addEventListener('resize', this.setTableHeight)
-    },
-    activated() {
-        this.setTableHeight()
-    },
-    beforeDestroy() {
-        window.removeEventListener('resize', this.setTableHeight)
-    },
     methods: {
-        setTableHeight() {
-            this.$nextTick(() => {
-                const page = this.$refs.page
-                const tableBox = this.$refs.tableBox
-                if (!page || !tableBox) {
-                    return
-                }
-                const pagination = tableBox.querySelector('.pagination')
-                const pageRect = page.getBoundingClientRect()
-                const tableRect = tableBox.getBoundingClientRect()
-                const paginationHeight = pagination ? pagination.offsetHeight : 0
-                const availableHeight = pageRect.bottom - tableRect.top - paginationHeight - 1
-                this.tableHeight = Math.max(120, Math.floor(availableHeight))
-            })
-        },
         async queryByPage() {
             const params = {
                 pageNo: this.pageNo,
+                pageSize: this.pageSize,
                 companyId: localStorage.getItem('companyId'),
                 applicantName: this.searchForm.applicantName,
                 leaveType: this.searchForm.leaveType,
@@ -335,12 +302,10 @@ export default {
             if (res.data.code == 200) {
                 this.tableData = res.data.data.list
                 this.total = res.data.data.total
-                this.setTableHeight()
             }
         },
         handleSearch() {
             this.pageNo = 1
-            this.setTableHeight()
             this.queryByPage()
         },
         resetSearch() {
@@ -353,6 +318,12 @@ export default {
             this.handleSearch()
         },
         handleCurrentChange(val) {
+            this.pageNo = val
+            this.queryByPage()
+        },
+        handleSizeChange(val) {
+            this.pageSize = val
+            this.pageNo = 1
             this.queryByPage()
         },
         beforeUpload(file) {
@@ -565,18 +536,68 @@ export default {
 </script>
 <style scoped>
 .leave-page {
+    padding: 12px;
     height: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
-.leave-table {
+.filter-form {
+    margin-bottom: 12px;
+    flex: none;
+}
+
+.filter-form .el-input,
+.filter-form .el-select {
+    width: 150px;
+}
+
+.filter-form .el-date-editor {
+    width: 220px;
+}
+
+::v-deep .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 12px;
+}
+
+::v-deep .filter-form .el-form-item {
+    margin: 0;
+}
+
+.filter-upload {
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.table-wrapper {
     flex: 1;
     min-height: 0;
+    overflow: hidden;
 }
 
-.leave-table ::v-deep .el-table__body tr {
+.el-pagination {
+    margin-top: 16px;
+    text-align: right;
+    flex: none;
+}
+
+.rounded-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+::v-deep .project-data-table .el-table__cell {
+    text-align: center;
+}
+
+::v-deep .project-data-table .el-table__body tr {
     cursor: pointer;
 }
 </style>
