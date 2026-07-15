@@ -38,24 +38,6 @@
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
                 <el-button icon="el-icon-refresh-left" @click="resetSearch">重置</el-button>
                 <el-button type="primary" icon="el-icon-plus" @click="showAddDialog" v-permission="'leave:add'">新增</el-button>
-                <el-upload
-                    class="filter-upload"
-                    :action="action"
-                    :show-file-list="false"
-                    accept=".xlsx,.xls"
-                    :headers="headers"
-                    :before-upload="beforeUpload"
-                    :on-success="successHandle"
-                >
-                    <el-button icon="el-icon-upload2" v-permission="'leave:import'">导入</el-button>
-                </el-upload>
-                <el-button
-                    icon="el-icon-download"
-                    v-permission="'leave:download'"
-                    @click="downloadTemplate('leaveModel.xlsx')"
-                    >下载模版</el-button
-                >
-                <el-button icon="el-icon-download" v-permission="'leave:export'" @click="downloadLeave">导出</el-button>
             </el-form-item>
         </el-form>
         <div class="table-wrapper">
@@ -219,15 +201,9 @@
 </template>
 
 <script>
-import md5 from 'md5'
-
 export default {
     data() {
         return {
-            action: this.$axios.defaults.baseURL + '/leave/import',
-            headers: {
-                Authorization: localStorage.getItem('Authorization')
-            },
             tableData: [],
             pageNo: 1,
             pageSize: 10,
@@ -277,11 +253,6 @@ export default {
         }
     },
     created() {
-        let timestamp = Date.now()
-        this.headers.Sign = md5(
-            'leave/import?timestamp=' + timestamp + '&key=yVwlsbIrY3q22EnoYYM4nR5zqTmqed05'
-        ).toUpperCase()
-        this.headers.Timestamp = timestamp
         this.queryByPage()
     },
     methods: {
@@ -325,60 +296,6 @@ export default {
             this.pageSize = val
             this.pageNo = 1
             this.queryByPage()
-        },
-        beforeUpload(file) {
-            const suffix = file.name.substring(file.name.lastIndexOf('.') + 1).toLowerCase()
-            if (suffix != 'xlsx' && suffix != 'xls') {
-                this.$message.error(`只能选择excel文件`)
-                return false
-            }
-            return true
-        },
-        successHandle(res, file, fileList) {
-            if (res.code === 200) {
-                this.$message.success('导入成功')
-                this.queryByPage()
-            } else {
-                this.$message.error(res.message)
-            }
-        },
-        downloadTemplate(templateName) {
-            let params = {
-                templateName: templateName
-            }
-            this.$axios.post('upload/downloadTemplate', params, { responseType: 'blob' }).then(res => {
-                this.downloadBlob(res.data, templateName)
-            })
-        },
-        downloadLeave() {
-            let params = {
-                exportCompanyId: localStorage.getItem('companyId'),
-                exportApplicantName: this.searchForm.applicantName,
-                exportLeaveType: this.searchForm.leaveType,
-                exportStatus: this.searchForm.status
-            }
-            if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
-                params.exportStartTime = this.searchForm.dateRange[0] + ' 00:00:00'
-                params.exportEndTime = this.searchForm.dateRange[1] + ' 23:59:59'
-            }
-            this.$axios.post('leave/export', params, { responseType: 'blob' }).then(res => {
-                this.downloadBlob(res.data, '请假单列表.xlsx')
-            })
-        },
-        downloadBlob(content, fileName) {
-            let blob = new Blob([content])
-            if ('download' in document.createElement('a')) {
-                let elink = document.createElement('a')
-                elink.download = fileName
-                elink.style.display = 'none'
-                elink.href = URL.createObjectURL(blob)
-                document.body.appendChild(elink)
-                elink.click()
-                URL.revokeObjectURL(elink.href)
-                document.body.removeChild(elink)
-            } else {
-                navigator.msSaveBlob(blob, fileName)
-            }
         },
         showAddDialog() {
             this.formType = 'add'
@@ -568,12 +485,6 @@ export default {
 
 ::v-deep .filter-form .el-form-item {
     margin: 0;
-}
-
-.filter-upload {
-    display: inline-block;
-    margin-left: 10px;
-    margin-right: 10px;
 }
 
 .table-wrapper {

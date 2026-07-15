@@ -67,10 +67,10 @@
                 <el-table-column prop="updatedAt" label="更新时间" width="180" align="center"></el-table-column>
                 <el-table-column label="操作" width="240" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button type="text" size="small" @click="previewFile(scope.row)" v-if="scope.row.type !== 1"
+                        <el-button type="text" size="small" @click="previewFile(scope.row)" v-if="!isFolder(scope.row)"
                             >打开</el-button
                         >
-                        <el-divider direction="vertical" v-if="scope.row.type !== 1"></el-divider>
+                        <el-divider direction="vertical" v-if="!isFolder(scope.row)"></el-divider>
                         <el-button
                             type="text"
                             size="small"
@@ -136,18 +136,18 @@ export default {
                 name: [{ required: true, message: '请输入名称', trigger: 'blur' }]
             },
             iconMap: {
-                1: require('@/assets/fileType/folder.svg'),
-                2: require('@/assets/fileType/image.svg'),
-                3: require('@/assets/fileType/word.svg'),
-                4: require('@/assets/fileType/excel.svg'),
-                5: require('@/assets/fileType/ppt.svg'),
-                6: require('@/assets/fileType/pdf.svg'),
-                7: require('@/assets/fileType/zip.svg'),
-                8: require('@/assets/fileType/txt.svg'),
-                9: require('@/assets/fileType/document.svg'),
-                10: require('@/assets/fileType/video.svg'),
-                11: require('@/assets/fileType/other.svg'),
-                12: require('@/assets/fileType/cad.svg')
+                folder: require('@/assets/fileType/folder.svg'),
+                image: require('@/assets/fileType/image.svg'),
+                word: require('@/assets/fileType/word.svg'),
+                excel: require('@/assets/fileType/excel.svg'),
+                ppt: require('@/assets/fileType/ppt.svg'),
+                pdf: require('@/assets/fileType/pdf.svg'),
+                archive: require('@/assets/fileType/zip.svg'),
+                txt: require('@/assets/fileType/txt.svg'),
+                document: require('@/assets/fileType/document.svg'),
+                video: require('@/assets/fileType/video.svg'),
+                unknown: require('@/assets/fileType/other.svg'),
+                cad: require('@/assets/fileType/cad.svg')
             }
         }
     },
@@ -261,7 +261,7 @@ export default {
             })
         },
         openRow(row) {
-            if (row.type === 1) {
+            if (this.isFolder(row)) {
                 this.currentFolder = row
                 this.breadcrumb.push(row)
                 this.keyword = ''
@@ -298,30 +298,17 @@ export default {
         },
         isCadFile(row) {
             const suffix = this.getFileSuffix(row.name || row.url || '')
-            return row.type === 12 || ['dwg', 'dxf', 'dwt'].includes(suffix)
+            return this.getFileCategory(row) === 'cad' || ['dwg', 'dxf', 'dwt'].includes(suffix)
         },
         fileIcon(row) {
-            return this.iconMap[row.type] || this.iconMap[11]
+            return this.iconMap[this.getFileCategory(row)] || this.iconMap.unknown
         },
         typeFormatter(row) {
-            const map = {
-                1: '文件夹',
-                2: '图片',
-                3: 'Word',
-                4: 'Excel',
-                5: 'PPT',
-                6: 'PDF',
-                7: '压缩文件',
-                8: 'TXT',
-                9: '文档',
-                10: '视频',
-                11: '其他',
-                12: 'CAD'
-            }
-            return map[row.type] || '其他'
+            if (this.isFolder(row)) return '文件夹'
+            return String(row.type || this.getFileType(row.name) || '未知格式').toUpperCase()
         },
         sizeFormatter(row) {
-            if (row.type === 1) {
+            if (this.isFolder(row)) {
                 return '-'
             }
             const size = Number(row.size || 0)
@@ -335,17 +322,25 @@ export default {
         },
         getFileType(filename) {
             const suffix = this.getFileSuffix(filename)
-            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(suffix)) return 2
-            if (['doc', 'docx'].includes(suffix)) return 3
-            if (['xls', 'xlsx'].includes(suffix)) return 4
-            if (['ppt', 'pptx'].includes(suffix)) return 5
-            if (suffix === 'pdf') return 6
-            if (['zip', 'rar', '7z', 'tar', 'gz'].includes(suffix)) return 7
-            if (suffix === 'txt') return 8
-            if (['md', 'rtf', 'ofd'].includes(suffix)) return 9
-            if (['mp4', 'avi', 'mov', 'wmv', 'mkv'].includes(suffix)) return 10
-            if (['dwg', 'dxf', 'dwt'].includes(suffix)) return 12
-            return 11
+            return suffix
+        },
+        isFolder(row) {
+            return row && row.type === 'folder'
+        },
+        getFileCategory(row) {
+            const type = String(row && row.type || this.getFileType(row && row.name) || '').toLowerCase()
+            if (type === 'folder') return 'folder'
+            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(type)) return 'image'
+            if (['doc', 'docx'].includes(type)) return 'word'
+            if (['xls', 'xlsx'].includes(type)) return 'excel'
+            if (['ppt', 'pptx'].includes(type)) return 'ppt'
+            if (type === 'pdf') return 'pdf'
+            if (['zip', 'rar', '7z', 'tar', 'gz'].includes(type)) return 'archive'
+            if (['txt', 'log'].includes(type)) return 'txt'
+            if (['md', 'rtf', 'ofd', 'json', 'xml', 'csv', 'ini', 'yml', 'yaml'].includes(type)) return 'document'
+            if (['mp4', 'avi', 'mov', 'wmv', 'mkv'].includes(type)) return 'video'
+            if (['dwg', 'dxf', 'dwt'].includes(type)) return 'cad'
+            return 'unknown'
         },
         getFileSuffix(filename) {
             const cleanName = String(filename || '').split('?')[0]
