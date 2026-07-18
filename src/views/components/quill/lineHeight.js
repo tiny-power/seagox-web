@@ -1,11 +1,11 @@
 import Quill from 'quill'
-import Parchment from 'parchment'
-const LineHeightClass = new Parchment.Attributor.Class('lineHeight', 'ql-line-height', {
-    scope: Parchment.Scope.INLINE,
+import { ClassAttributor, Scope, StyleAttributor } from 'parchment'
+const LineHeightClass = new ClassAttributor('lineHeight', 'ql-line-height', {
+    scope: Scope.INLINE,
     whitelist: ['1', '1.5', '1.6', '1.75', '2', '3', '4', '5']
 })
-const LineHeightStyle = new Parchment.Attributor.Style('lineHeight', 'ql-line-height', {
-    scope: Parchment.Scope.INLINE,
+const LineHeightStyle = new StyleAttributor('lineHeight', 'ql-line-height', {
+    scope: Scope.INLINE,
     whitelist: [1, 1.5, 1.6, 1.75, 2, 3, 4, 5]
 })
 Quill.register({ 'formats/lineHeight': LineHeightClass }, true)

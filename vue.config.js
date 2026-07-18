@@ -31,7 +31,7 @@ module.exports = {
             }
         }
     },
-    transpileDependencies: ['sock-js', 'sockjs-client', 'vue-grid-layout', 'quill-image-extend-module'],
+    transpileDependencies: ['sock-js', 'sockjs-client', 'vue-grid-layout', 'quill', 'parchment', 'quill-delta'],
     chainWebpack: config => {
         // 移除 prefetch 插件
         config.plugins.delete('prefetch')
