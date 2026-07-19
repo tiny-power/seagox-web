@@ -2,7 +2,7 @@
     <div v-loading="loading" class="design-case-form-page">
         <el-form ref="form" :model="form" :rules="rules" label-width="96px">
             <el-form-item label="案例标题" prop="title">
-                <el-input v-model.trim="form.title" maxlength="200" show-word-limit />
+                <el-input v-model.trim="form.title" placeholder="请输入案例标题" maxlength="200" show-word-limit />
             </el-form-item>
             <el-form-item label="封面图片" prop="coverUrl">
                 <el-upload
@@ -18,6 +18,7 @@
                     accept="image/*"
                 >
                     <i class="el-icon-plus"></i>
+                    <div slot="tip" class="el-upload__tip">请上传封面图片</div>
                 </el-upload>
             </el-form-item>
             <el-row :gutter="16">
@@ -39,12 +40,12 @@
             <el-row :gutter="16">
                 <el-col :span="12">
                     <el-form-item label="省名称" prop="provinceName">
-                        <el-input v-model.trim="form.provinceName" />
+                        <el-input v-model.trim="form.provinceName" placeholder="请输入省名称" />
                     </el-form-item>
                 </el-col>
                 <el-col :span="12">
                     <el-form-item label="城市名称" prop="cityName">
-                        <el-input v-model.trim="form.cityName" />
+                        <el-input v-model.trim="form.cityName" placeholder="请输入城市名称" />
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -56,6 +57,7 @@
                             :min="0"
                             :precision="2"
                             :controls="false"
+                            placeholder="请输入建筑面积"
                             class="full-width"
                         />
                     </el-form-item>
@@ -67,6 +69,7 @@
                             :min="1"
                             :precision="0"
                             :controls="false"
+                            placeholder="请输入层数"
                             class="full-width"
                         />
                     </el-form-item>
@@ -88,6 +91,7 @@
                             allow-create
                             filterable
                             default-first-option
+                            placeholder="请选择或输入特殊标签"
                             class="full-width"
                         >
                             <el-option v-for="item in specialOptions" :key="item" :label="item" :value="item" />
@@ -96,7 +100,7 @@
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="状态" prop="status">
-                        <el-select v-model="form.status" class="full-width">
+                        <el-select v-model="form.status" placeholder="请选择状态" class="full-width">
                             <el-option
                                 v-for="item in statusOptions"
                                 :key="item.value"
@@ -108,7 +112,12 @@
                 </el-col>
                 <el-col :span="8">
                     <el-form-item label="排序">
-                        <el-input-number v-model="form.sort" :precision="0" class="full-width sort-input" />
+                        <el-input-number
+                            v-model="form.sort"
+                            :precision="0"
+                            placeholder="请输入排序"
+                            class="full-width sort-input"
+                        />
                     </el-form-item>
                 </el-col>
             </el-row>
