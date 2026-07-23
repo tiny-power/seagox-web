@@ -105,27 +105,24 @@
 
 <script>
 import Quill from 'quill'
+import QuillTableBetter from 'quill-table-better'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+import 'quill-table-better/dist/quill-table-better.css'
+import './sizeStyle'
+import './letterSpacing'
+import './listStyle'
+import './firstLineIndent'
+import './lineHeight'
+import Divider from './divider'
 
 const icons = Quill.import('ui/icons')
-const Parchment = Quill.import('parchment')
-const SizeStyle = Quill.import('attributors/style/size')
 const fontSizes = ['12px', '14px', '15px', '16px', '17px', '18px', '20px', '24px']
+const lineHeightValues = ['1', '1.5', '1.6', '1.75', '2', '3', '4', '5']
 const letterSpacingValues = ['0px', '0.5px', '1px', '2px']
 const listStyleValues = ['circle', 'disc', 'square', 'decimal', 'lower-alpha', 'lower-roman', 'upper-alpha', 'upper-roman']
-SizeStyle.whitelist = fontSizes
-Quill.register(SizeStyle, true)
-const LetterSpacingStyle = new Parchment.StyleAttributor('letterSpacing', 'letter-spacing', {
-    scope: Parchment.Scope.INLINE,
-    whitelist: letterSpacingValues
-})
-Quill.register(LetterSpacingStyle, true)
-const ListStyleClass = new Parchment.ClassAttributor('listStyle', 'ql-list-style', {
-    scope: Parchment.Scope.BLOCK,
-    whitelist: listStyleValues
-})
-Quill.register(ListStyleClass, true)
+Quill.register({ 'formats/divider': Divider }, true)
+Quill.register({ 'modules/table-better': QuillTableBetter }, true)
 const strokeIcon = (paths, scale = 1) => {
     const offset = ((24 - 24 * scale) / 2).toFixed(2)
     const content = scale === 1 ? paths : `<g transform="translate(${offset} ${offset}) scale(${scale})">${paths}</g>`
@@ -141,6 +138,7 @@ const polyline = points => `<polyline points="${points}"></polyline>`
 const circle = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}"></circle>`
 const rect = (x, y, width, height, rx = 2) => `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${rx}"></rect>`
 const toolbarTips = {
+    formatBrush: '格式刷',
     bold: '加粗',
     italic: '斜体',
     underline: '下划线',
@@ -148,9 +146,14 @@ const toolbarTips = {
     color: '文字颜色',
     background: '背景颜色',
     align: '对齐方式',
+    size: '字号',
+    firstLineIndent: '首行缩进',
+    lineHeight: '行间距',
     letterSpacing: '字间距',
+    'table-better': '插入表格',
     'list-style': '列表样式',
     blockquote: '引用',
+    divider: '分隔线',
     'code-block': '代码块',
     link: '插入链接',
     image: '插入图片',
@@ -261,13 +264,17 @@ const hexToHsv = value => {
 }
 
 Object.assign(icons, {
+    formatBrush: strokeIcon(`${path('M7 5.5h9.5v5H7z')}${path('M9 10.5v3.2a2 2 0 0 0 2 2h1')}${path('M13.5 15.7h3v3.8h-3z')}${line(8.5, 7.8, 15, 7.8)}`),
     bold: strokeIcon(`${path('M8 6h5.7a3.2 3.2 0 0 1 0 6.4H8z')}${path('M8 12.4h6.4a3.2 3.2 0 0 1 0 6.4H8z')}${line(8, 6, 8, 18.8)}`),
     italic: strokeIcon(`${line(10.5, 6, 17, 6)}${line(7, 18, 13.5, 18)}${line(14, 6, 10, 18)}`),
     underline: strokeIcon(`${path('M7.5 6v5.5a4.5 4.5 0 0 0 9 0V6')}${line(7, 19, 17, 19)}`),
     strike: strokeIcon(`${line(5.5, 12, 18.5, 12)}${path('M15.8 7A4.6 4.6 0 0 0 12.4 6H11a2.7 2.7 0 0 0-2 4.6')}${path('M8.2 17A5 5 0 0 0 12 18.4h1.1a2.7 2.7 0 0 0 2-4.6')}`),
     color: strokeIcon(`${path('M12 5.5l5 13')}${path('M7 18.5l5-13')}${line(8.8, 14.5, 15.2, 14.5)}`),
     background: strokeIcon(`${path('M5.5 14l6.5-6.5 5 5-6.5 6.5h-5z')}${line(13.8, 8.8, 17.3, 5.3)}${line(16, 18.5, 19, 18.5)}`),
+    firstLineIndent: strokeIcon(`${line(6, 7, 18.5, 7)}${line(10, 11, 18.5, 11)}${line(6, 15, 18.5, 15)}${polyline('6 10 8.5 12.5 6 15')}`),
+    'table-better': strokeIcon(`${rect(5, 5.5, 14, 13, 1.5)}${line(5, 10, 19, 10)}${line(5, 14, 19, 14)}${line(9.7, 5.5, 9.7, 18.5)}${line(14.3, 5.5, 14.3, 18.5)}`),
     blockquote: strokeIcon(`${path('M8.2 9.2H6a3.5 3.5 0 0 0 3.5 3.5v4H6v-4a6 6 0 0 1 2.2-4.8z')}${path('M17.2 9.2H15a3.5 3.5 0 0 0 3.5 3.5v4H15v-4a6 6 0 0 1 2.2-4.8z')}`),
+    divider: strokeIcon(`${line(5, 12, 19, 12)}${line(8, 8, 16, 8)}${line(8, 16, 16, 16)}`),
     'code-block': strokeIcon(`${polyline('9 8 5 12 9 16')}${polyline('15 8 19 12 15 16')}${line(13, 6, 11, 18)}`),
     link: strokeIcon(`${path('M10 13a4.4 4.4 0 0 0 6.2.2l1.8-1.8a4.4 4.4 0 0 0-6.2-6.2l-1 1')}${path('M14 11a4.4 4.4 0 0 0-6.2-.2L6 12.6a4.4 4.4 0 0 0 6.2 6.2l1-1')}`),
     image: strokeIcon(`${rect(5, 6, 14, 12, 2)}${circle(9, 10, 1.3)}${polyline('19 15 15.5 11.5 7 18')}`),
@@ -313,7 +320,11 @@ export default {
             colorPickerTab: 'basic',
             activeColorFormat: 'color',
             selectedTextColor: '#ff0000',
+            selectedLineHeight: '1.6',
             selectedLetterSpacing: '0px',
+            formatBrushActive: false,
+            formatBrushFormats: null,
+            applyingFormatBrush: false,
             appliedTextColor: '#000000',
             appliedBackgroundColor: '#ffff00',
             savedTextColorRange: null,
@@ -373,24 +384,47 @@ export default {
                     toolbar: this.enable
                         ? {
                               container: [
-                                  ['clean', { size: fontSizes }, 'bold', 'italic', 'underline', 'strike'],
+                                  ['clean', 'formatBrush', { size: fontSizes }, 'bold', 'italic', 'underline', 'strike'],
                                   [{ color: [] }, { background: [] }],
-                                  [{ align: [] }, { letterSpacing: letterSpacingValues }, 'list-style'],
-                                  ['blockquote', 'code-block'],
+                                  [{ align: [] }, 'firstLineIndent', { lineHeight: lineHeightValues }, { letterSpacing: letterSpacingValues }, 'list-style'],
+                                  ['table-better', 'blockquote', 'divider', 'code-block'],
                                   ['link', 'image']
                               ],
                               handlers: {
                                   image: () => this.selectImage(),
+                                  formatBrush: () => this.toggleFormatBrush(),
+                                  firstLineIndent: () => this.toggleFirstLineIndent(),
+                                  lineHeight: value => {
+                                      this.applyLineHeight(value)
+                                  },
                                   letterSpacing: value => {
                                       this.applyLetterSpacing(value)
+                                  },
+                                  divider: () => {
+                                      this.insertDivider()
                                   }
                               }
                           }
-                        : false
+                        : false,
+                    table: false,
+                    'table-better': this.enable
+                        ? {
+                              language: 'zh_CN',
+                              menus: ['column', 'row', 'merge', 'table', 'cell', 'wrap', 'copy', 'delete'],
+                              toolbarTable: true
+                          }
+                        : false,
+                    keyboard: this.enable
+                        ? {
+                              bindings: QuillTableBetter.keyboardBindings
+                          }
+                        : undefined
                 }
             })
             this.setToolbarTips()
             this.setDefaultSize()
+            this.setDefaultLineHeight()
+            this.setLineHeightPicker()
             this.setDefaultLetterSpacing()
             this.setLetterSpacingPicker()
             this.setColorPickers()
@@ -410,7 +444,9 @@ export default {
                 this.updateColorLabel('color', this.getCurrentColor('color'))
                 this.updateColorLabel('background', this.getCurrentColor('background'))
                 const formats = this.quill.getFormat(range)
+                this.updateLineHeightPicker(formats.lineHeight || this.selectedLineHeight || '1.6')
                 this.updateLetterSpacingPicker(formats.letterSpacing || this.selectedLetterSpacing || '0px')
+                this.applyPendingFormatBrush(range)
             })
             this.$emit('html-change', this.quill.getSemanticHTML())
         },
@@ -450,6 +486,84 @@ export default {
             const defaultItem = items.find(item => item.getAttribute('data-value') === '17px')
             if (defaultItem) defaultItem.classList.add('ql-selected')
             if (label) label.setAttribute('data-value', '17px')
+        },
+        setDefaultLineHeight() {
+            this.updateLineHeightPicker('1.6')
+        },
+        setLineHeightPicker() {
+            const toolbar = this.$el.querySelector('.ql-toolbar')
+            const lineHeightPicker = toolbar && toolbar.querySelector('.ql-picker.ql-lineHeight')
+            if (!lineHeightPicker) return
+            const syncSelected = () => {
+                setTimeout(() => {
+                    this.updateLineHeightPicker(this.selectedLineHeight || '1.6')
+                }, 0)
+            }
+            const label = lineHeightPicker.querySelector('.ql-picker-label')
+            if (label) {
+                label.addEventListener('mousedown', syncSelected)
+                label.addEventListener('click', syncSelected)
+            }
+            lineHeightPicker.querySelectorAll('.ql-picker-item').forEach(item => {
+                item.addEventListener('mousedown', event => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    const value = item.getAttribute('data-value') || '1.6'
+                    this.applyLineHeight(value)
+                })
+                item.addEventListener('click', event => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    setTimeout(() => {
+                        syncSelected()
+                        this.closeLineHeightPicker()
+                    }, 0)
+                })
+            })
+        },
+        closeLineHeightPicker() {
+            const toolbar = this.$el.querySelector('.ql-toolbar')
+            const lineHeightPicker = toolbar && toolbar.querySelector('.ql-picker.ql-lineHeight')
+            if (!lineHeightPicker) return
+            lineHeightPicker.classList.remove('ql-expanded')
+            const label = lineHeightPicker.querySelector('.ql-picker-label')
+            if (label) label.setAttribute('aria-expanded', 'false')
+        },
+        updateLineHeightPicker(value) {
+            const lineHeight = lineHeightValues.includes(value) ? value : '1.6'
+            const toolbar = this.$el.querySelector('.ql-toolbar')
+            const lineHeightSelect = toolbar && toolbar.querySelector('select.ql-lineHeight')
+            const lineHeightPicker = toolbar && toolbar.querySelector('.ql-picker.ql-lineHeight')
+            if (lineHeightSelect) {
+                lineHeightSelect.value = lineHeight
+                Array.from(lineHeightSelect.options).forEach(option => {
+                    option.selected = option.value === lineHeight
+                })
+            }
+            if (!lineHeightPicker) return
+            const label = lineHeightPicker.querySelector('.ql-picker-label')
+            const items = Array.from(lineHeightPicker.querySelectorAll('.ql-picker-item'))
+            if (label) label.setAttribute('data-value', lineHeight)
+            items.forEach(item => {
+                item.classList.toggle('ql-selected', item.getAttribute('data-value') === lineHeight)
+            })
+        },
+        applyLineHeight(value) {
+            const lineHeight = lineHeightValues.includes(value) ? value : '1.6'
+            const range = this.quill.getSelection(true)
+            this.selectedLineHeight = lineHeight
+            if (range) {
+                this.quill.formatLine(range.index, range.length || 1, 'lineHeight', lineHeight, 'user')
+                this.quill.setSelection(range.index, range.length, 'silent')
+            }
+            this.$nextTick(() => {
+                this.updateLineHeightPicker(lineHeight)
+                this.closeLineHeightPicker()
+            })
+            setTimeout(() => {
+                this.updateLineHeightPicker(lineHeight)
+                this.closeLineHeightPicker()
+            }, 0)
         },
         setDefaultLetterSpacing() {
             const toolbar = this.$el.querySelector('.ql-toolbar')
@@ -546,6 +660,52 @@ export default {
                 this.updateLetterSpacingPicker(spacing)
                 this.closeLetterSpacingPicker()
             }, 0)
+        },
+        toggleFormatBrush() {
+            const range = this.quill.getSelection(true)
+            if (!range) return
+            this.formatBrushFormats = this.quill.getFormat(range)
+            this.formatBrushActive = !!this.formatBrushFormats
+            this.updateFormatBrushButton()
+        },
+        updateFormatBrushButton() {
+            const toolbar = this.$el.querySelector('.ql-toolbar')
+            const button = toolbar && toolbar.querySelector('button.ql-formatBrush')
+            if (button) button.classList.toggle('ql-active', this.formatBrushActive)
+        },
+        applyPendingFormatBrush(range) {
+            if (!this.formatBrushActive || this.applyingFormatBrush || !range || range.length === 0) return
+            this.applyingFormatBrush = true
+            const formats = this.formatBrushFormats || {}
+            const lineFormats = ['align', 'lineHeight', 'firstLineIndent', 'list', 'listStyle']
+            Object.keys(formats).forEach(format => {
+                if (lineFormats.includes(format)) {
+                    this.quill.formatLine(range.index, range.length, format, formats[format], 'user')
+                } else {
+                    this.quill.formatText(range.index, range.length, format, formats[format], 'user')
+                }
+            })
+            this.quill.setSelection(range.index, range.length, 'silent')
+            this.formatBrushActive = false
+            this.formatBrushFormats = null
+            this.updateFormatBrushButton()
+            this.$nextTick(() => {
+                this.applyingFormatBrush = false
+            })
+        },
+        toggleFirstLineIndent() {
+            const range = this.quill.getSelection(true)
+            const formats = range ? this.quill.getFormat(range) : {}
+            if (!range) return
+            this.quill.formatLine(range.index, range.length || 1, 'firstLineIndent', formats.firstLineIndent ? false : '2em', 'user')
+            this.quill.setSelection(range.index, range.length, 'silent')
+        },
+        insertDivider() {
+            const range = this.quill.getSelection(true)
+            const index = range ? range.index : this.quill.getLength()
+            this.quill.insertEmbed(index, 'divider', true, 'user')
+            this.quill.insertText(index + 1, '\n', 'user')
+            this.quill.setSelection(index + 2, 0, 'silent')
         },
         setColorPickers() {
             this.setColorPicker('color')
@@ -1183,8 +1343,7 @@ export default {
 }
 
 .quill-editor /deep/ .ql-toolbar button[data-tooltip]:hover::after,
-.quill-editor /deep/ .ql-toolbar .ql-color-picker .ql-picker-label[data-tooltip]:hover::after,
-.quill-editor /deep/ .ql-toolbar .ql-icon-picker .ql-picker-label[data-tooltip]:hover::after {
+.quill-editor /deep/ .ql-toolbar .ql-picker-label[data-tooltip]:hover::after {
     content: attr(data-tooltip);
     position: absolute;
     left: 50%;
@@ -1202,9 +1361,7 @@ export default {
     white-space: nowrap;
 }
 
-.quill-editor /deep/ .ql-toolbar button[data-tooltip]:hover::before,
-.quill-editor /deep/ .ql-toolbar .ql-color-picker .ql-picker-label[data-tooltip]:hover::before,
-.quill-editor /deep/ .ql-toolbar .ql-icon-picker .ql-picker-label[data-tooltip]:hover::before {
+.quill-editor /deep/ .ql-toolbar button[data-tooltip]:hover::before {
     content: '';
     position: absolute;
     left: 50%;
@@ -1248,6 +1405,7 @@ export default {
 }
 
 .quill-editor /deep/ .ql-snow .ql-picker.ql-size .ql-picker-label,
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-label,
 .quill-editor /deep/ .ql-snow .ql-picker.ql-letterSpacing .ql-picker-label,
 .quill-editor /deep/ .ql-snow .ql-picker.ql-align .ql-picker-label,
 .quill-editor /deep/ .ql-snow .ql-picker.ql-color .ql-picker-label,
@@ -1256,6 +1414,7 @@ export default {
 }
 
 .quill-editor /deep/ .ql-snow .ql-picker.ql-size .ql-picker-options,
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-options,
 .quill-editor /deep/ .ql-snow .ql-picker.ql-letterSpacing .ql-picker-options,
 .quill-editor /deep/ .ql-snow .ql-picker.ql-align .ql-picker-options,
 .quill-editor /deep/ .ql-snow .ql-picker.ql-color .ql-picker-options,
@@ -1419,6 +1578,79 @@ export default {
     font-size: 24px;
 }
 
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight {
+    display: inline-flex;
+    align-items: center;
+    width: 34px;
+    height: 34px;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    color: #606266;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-label::before {
+    content: 'LH';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    color: currentColor;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-label svg {
+    display: none;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-options {
+    min-width: 88px;
+    padding: 4px 0;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-item {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 16px;
+    color: #606266;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-item::before {
+    content: attr(data-value);
+    display: inline-flex;
+    align-items: center;
+    color: currentColor;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-label:hover,
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-label.ql-active,
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-item:hover {
+    color: #409eff;
+}
+
+.quill-editor /deep/ .ql-snow .ql-picker.ql-lineHeight .ql-picker-item.ql-selected {
+    background: #ecf5ff !important;
+    color: #409eff !important;
+}
+
 .quill-editor /deep/ .ql-snow .ql-picker.ql-letterSpacing {
     display: inline-flex;
     align-items: center;
@@ -1521,6 +1753,13 @@ export default {
 
 .quill-editor /deep/ .ql-editor {
     font-size: 17px;
+    line-height: 1.6;
+}
+
+.quill-editor /deep/ .ql-editor hr {
+    border: none;
+    border-top: 1px solid #eeeeee;
+    margin: 12px 0;
 }
 
 .quill-editor /deep/ .ql-editor ol,

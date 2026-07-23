@@ -242,6 +242,14 @@ const routes = [
                 }
             },
             {
+                name: 'knowledge',
+                path: '/knowledge',
+                component: () => import('@/views/business/knowledge'),
+                meta: {
+                    title: '科普管理'
+                }
+            },
+            {
                 name: 'projectHandover',
                 path: '/projectHandover',
                 component: () => import('@/views/business/project-handover'),
